@@ -11,17 +11,9 @@ import RevenueChart from '../components/RevenueChart';
 import NetAssetsChart from '../components/NetAssetsChart';
 import MeetingsList from '../components/MeetingsList';
 import AnnouncementsList from '../components/AnnouncementsList';
-import { quickStats } from '../data/dashboard';
-
-function fmt(n) {
-  if (n >= 1000000) return `$${(n / 1000000).toFixed(2)}M`;
-  if (n >= 1000) return `$${(n / 1000).toFixed(0)}K`;
-  return `$${n}`;
-}
-
-function fmtNum(n) {
-  return n.toLocaleString('en-US');
-}
+import { revenueExpenseData, netAssetsData } from '../data/financials';
+import { quickStats, upcomingMeetings, announcements } from '../data/dashboard';
+import { formatDollarDetail, formatNumber } from '../lib/formatters';
 
 export default function Dashboard() {
   return (
@@ -34,26 +26,32 @@ export default function Dashboard() {
         </p>
       </div>
 
-      {/* Stat cards — 2 cols on mobile, 3 on tablet, 6 on desktop */}
+      {/* Stat cards */}
       <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-3">
-        <StatCard icon={DollarSign} label="Revenue" value={fmt(quickStats.currentFYRevenue)} subtext={quickStats.fiscalYear} />
-        <StatCard icon={TrendingUp} label="Net Assets" value={fmt(quickStats.netAssets)} subtext="+1,002% since FY15" accent="purple" />
-        <StatCard icon={Building2} label="Total Assets" value={fmt(quickStats.totalAssets)} subtext={quickStats.fiscalYear} />
-        <StatCard icon={Users} label="Employees" value={fmtNum(quickStats.employees)} subtext={quickStats.fiscalYear} />
-        <StatCard icon={Heart} label="Volunteers" value={fmtNum(quickStats.volunteers)} subtext="4× prior year" accent="purple" />
-        <StatCard icon={Ticket} label="Visitors" value={fmtNum(quickStats.visitors)} subtext={quickStats.fiscalYear} />
+        <StatCard icon={DollarSign} label="Revenue" value={formatDollarDetail(quickStats.currentFYRevenue)} subtext={quickStats.fiscalYear} />
+        <StatCard icon={TrendingUp} label="Net Assets" value={formatDollarDetail(quickStats.netAssets)} subtext="+1,002% since FY15" accent="purple" />
+        <StatCard icon={Building2} label="Total Assets" value={formatDollarDetail(quickStats.totalAssets)} subtext={quickStats.fiscalYear} />
+        <StatCard icon={Users} label="Employees" value={formatNumber(quickStats.employees)} subtext={quickStats.fiscalYear} />
+        <StatCard icon={Heart} label="Volunteers" value={formatNumber(quickStats.volunteers)} subtext="4× prior year" accent="purple" />
+        <StatCard icon={Ticket} label="Visitors" value={formatNumber(quickStats.visitors)} subtext={quickStats.fiscalYear} />
       </div>
 
-      {/* Charts — stacked on mobile, side by side on larger screens */}
+      {/* Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        <RevenueChart />
-        <NetAssetsChart />
+        <RevenueChart
+          data={revenueExpenseData}
+          source="Source: IRS Form 990 filings, FY 2015–2024"
+        />
+        <NetAssetsChart
+          data={netAssetsData}
+          subtitle="$116K → $1.28M over 10 years"
+        />
       </div>
 
       {/* Meetings + Announcements */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        <MeetingsList />
-        <AnnouncementsList />
+        <MeetingsList meetings={upcomingMeetings} />
+        <AnnouncementsList announcements={announcements} />
       </div>
     </div>
   );

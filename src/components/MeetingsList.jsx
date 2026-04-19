@@ -1,38 +1,26 @@
 import { Calendar, MapPin, Clock } from 'lucide-react';
-import { upcomingMeetings } from '../data/dashboard';
+import Card, { CardHeader } from './ui/Card';
+import IconBox from './ui/IconBox';
+import { formatDateMedium, daysUntil } from '../lib/formatters';
 
-function formatDate(dateStr) {
-  const d = new Date(dateStr + 'T12:00:00');
-  return d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
-}
-
-function daysUntil(dateStr) {
-  const now = new Date();
-  now.setHours(0, 0, 0, 0);
-  const target = new Date(dateStr + 'T12:00:00');
-  target.setHours(0, 0, 0, 0);
-  const diff = Math.ceil((target - now) / (1000 * 60 * 60 * 24));
-  if (diff === 0) return 'Today';
-  if (diff === 1) return 'Tomorrow';
-  if (diff < 0) return 'Past';
-  return `${diff} days`;
-}
-
-export default function MeetingsList() {
+/**
+ * List of upcoming meetings.
+ * Receives meetings array as a prop — no direct data imports.
+ */
+export default function MeetingsList({ meetings }) {
   return (
-    <div className="bg-white rounded-xl border border-border p-4">
-      <h3 className="text-sm font-semibold text-dark mb-3">Upcoming Meetings</h3>
+    <Card>
+      <CardHeader title="Upcoming Meetings" />
       <div className="space-y-3">
-        {upcomingMeetings.map((meeting) => (
+        {meetings.map((meeting) => (
           <div
             key={meeting.id}
             className="flex gap-3 p-3 rounded-lg bg-light-gray/60 border border-border/50"
           >
-            <div className={`shrink-0 w-10 h-10 rounded-lg flex items-center justify-center ${
-              meeting.type === 'board' ? 'bg-purple-light text-purple' : 'bg-teal-light text-teal'
-            }`}>
-              <Calendar className="w-4 h-4" />
-            </div>
+            <IconBox
+              icon={Calendar}
+              accent={meeting.type === 'board' ? 'purple' : 'teal'}
+            />
             <div className="min-w-0 flex-1">
               <div className="flex items-start justify-between gap-2">
                 <p className="text-sm font-medium text-dark leading-snug">{meeting.title}</p>
@@ -43,7 +31,7 @@ export default function MeetingsList() {
               <div className="flex flex-wrap items-center gap-x-3 gap-y-0.5 mt-1">
                 <span className="flex items-center gap-1 text-xs text-med-gray">
                   <Clock className="w-3 h-3" />
-                  {formatDate(meeting.date)} · {meeting.time}
+                  {formatDateMedium(meeting.date)} · {meeting.time}
                 </span>
                 <span className="flex items-center gap-1 text-xs text-med-gray">
                   <MapPin className="w-3 h-3" />
@@ -54,6 +42,6 @@ export default function MeetingsList() {
           </div>
         ))}
       </div>
-    </div>
+    </Card>
   );
 }

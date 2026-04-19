@@ -1,41 +1,39 @@
 import { Bell, AlertTriangle } from 'lucide-react';
-import { announcements } from '../data/dashboard';
+import Card, { CardHeader } from './ui/Card';
+import IconBox from './ui/IconBox';
+import Badge from './ui/Badge';
+import { formatDateShort } from '../lib/formatters';
 
-function formatDate(dateStr) {
-  const d = new Date(dateStr + 'T12:00:00');
-  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-}
-
-export default function AnnouncementsList() {
+/**
+ * List of recent announcements.
+ * Receives announcements array as a prop — no direct data imports.
+ */
+export default function AnnouncementsList({ announcements }) {
   return (
-    <div className="bg-white rounded-xl border border-border p-4">
-      <h3 className="text-sm font-semibold text-dark mb-3">Announcements</h3>
+    <Card>
+      <CardHeader title="Announcements" />
       <div className="space-y-3">
         {announcements.map((item) => (
           <div key={item.id} className="flex gap-3">
-            <div className={`shrink-0 w-8 h-8 rounded-lg flex items-center justify-center mt-0.5 ${
-              item.priority === 'high' ? 'bg-orange/10 text-orange' : 'bg-teal-light text-teal'
-            }`}>
-              {item.priority === 'high'
-                ? <AlertTriangle className="w-4 h-4" />
-                : <Bell className="w-4 h-4" />
-              }
-            </div>
+            <IconBox
+              icon={item.priority === 'high' ? AlertTriangle : Bell}
+              accent={item.priority === 'high' ? 'orange' : 'teal'}
+              size="sm"
+              className="mt-0.5"
+            />
             <div className="min-w-0">
               <div className="flex items-center gap-2">
                 <p className="text-sm font-medium text-dark leading-snug">{item.title}</p>
                 {item.priority === 'high' && (
-                  <span className="shrink-0 text-[10px] font-semibold uppercase text-orange bg-orange/10 px-1.5 py-0.5 rounded-full">
-                    Important
-                  </span>
+                  <Badge variant="important">Important</Badge>
                 )}
               </div>
               <p className="text-xs text-med-gray mt-0.5 line-clamp-2">{item.summary}</p>
-              <p className="text-xs text-med-gray/70 mt-1">{formatDate(item.date)}</p>
+              <p className="text-xs text-med-gray/70 mt-1">{formatDateShort(item.date)}</p>
             </div>
           </div>
         ))}
       </div>
-    </div>
+    </Card>
   );
 }

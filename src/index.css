@@ -1,61 +1,61 @@
 @import "tailwindcss";
 
-/* ── ACM Brand Theme ── */
+/* ══════════════════════════════════════════════════════════════
+   ACM Brand Theme — Single source of truth for Tailwind utilities.
+   JS-side tokens live in src/lib/tokens.js and must stay in sync.
+   ══════════════════════════════════════════════════════════════ */
 @theme {
+  /* Brand */
   --color-teal: #00A89D;
   --color-teal-dark: #008C83;
   --color-teal-light: #E6F7F6;
   --color-purple: #5B2D8E;
   --color-purple-dark: #4A2473;
   --color-purple-light: #F0EAF5;
+
+  /* Rainbow palette */
   --color-orange: #F7941D;
   --color-red: #ED1C24;
   --color-yellow: #FFF200;
   --color-green: #00A651;
   --color-blue: #00AEEF;
   --color-pink: #EC008C;
+
+  /* Neutrals */
   --color-dark: #333333;
   --color-med-gray: #666666;
   --color-light-gray: #F5F5F5;
   --color-border: #E5E7EB;
+  --color-background: #FAFAFA;
+
+  /* Typography */
   --font-sans: 'Inter', 'Arial', system-ui, sans-serif;
   --font-display: 'Georgia', serif;
 }
 
-/* ── Rainbow Bar Gradient ── */
-.rainbow-bar {
-  height: 4px;
-  background: linear-gradient(
-    to right,
-    #ED1C24 0%,
-    #F7941D 16%,
-    #FFF200 32%,
-    #00A651 48%,
-    #00AEEF 64%,
-    #5B2D8E 80%,
-    #EC008C 100%
-  );
-}
-
+/* ── Rainbow Bar ──
+   Uses theme variables so the gradient updates if colors change. */
+.rainbow-bar,
 .rainbow-bar-thick {
-  height: 6px;
   background: linear-gradient(
     to right,
-    #ED1C24 0%,
-    #F7941D 16%,
-    #FFF200 32%,
-    #00A651 48%,
-    #00AEEF 64%,
-    #5B2D8E 80%,
-    #EC008C 100%
+    var(--color-red) 0%,
+    var(--color-orange) 16%,
+    var(--color-yellow) 32%,
+    var(--color-green) 48%,
+    var(--color-blue) 64%,
+    var(--color-purple) 80%,
+    var(--color-pink) 100%
   );
 }
+.rainbow-bar       { height: 4px; }
+.rainbow-bar-thick { height: 6px; }
 
 /* ── Base Styles ── */
 body {
   font-family: var(--font-sans);
   color: var(--color-dark);
-  background-color: #FAFAFA;
+  background-color: var(--color-background);
   margin: 0;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -67,10 +67,10 @@ body {
   flex-direction: column;
 }
 
-/* ── Recharts overrides ── */
+/* ── Recharts global overrides ── */
 .recharts-cartesian-axis-tick-value {
   font-size: 11px;
-  fill: #666666;
+  fill: var(--color-med-gray);
 }
 
 .recharts-tooltip-wrapper {
