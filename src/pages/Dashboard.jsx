@@ -12,10 +12,22 @@ import NetAssetsChart from '../components/NetAssetsChart';
 import MeetingsList from '../components/MeetingsList';
 import AnnouncementsList from '../components/AnnouncementsList';
 import { revenueExpenseData, netAssetsData } from '../data/financials';
-import { quickStats, upcomingMeetings, announcements } from '../data/dashboard';
+import { quickStats, announcements } from '../data/dashboard';
+import { useMeetings } from '../hooks/useMeetings';
+import { upcomingMeetings } from '../data/meetings';
 import { formatDollarDetail, formatNumber } from '../lib/formatters';
+import { timeDisplay } from '../data/meetings';
 
 export default function Dashboard() {
+  const { meetings } = useMeetings();
+  const upcoming = upcomingMeetings(meetings).slice(0, 4);
+
+  // Enrich meetings with a display-ready time string
+  const enriched = upcoming.map(m => ({
+    ...m,
+    time: timeDisplay(m),
+  }));
+
   return (
     <div className="p-4 sm:p-6 max-w-6xl mx-auto space-y-6">
       {/* Page header */}
@@ -50,7 +62,7 @@ export default function Dashboard() {
 
       {/* Meetings + Announcements */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        <MeetingsList meetings={upcomingMeetings} />
+        <MeetingsList meetings={enriched} />
         <AnnouncementsList announcements={announcements} />
       </div>
     </div>

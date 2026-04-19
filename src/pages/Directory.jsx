@@ -1,27 +1,28 @@
 import { useState, useMemo } from 'react';
-import { Search, Users, Filter } from 'lucide-react';
+import { Search, Users, Filter, Database, HardDrive } from 'lucide-react';
 import MemberCard from '../components/directory/MemberCard';
-import boardMembers, { sortedMembers, allCommittees, displayName } from '../data/boardMembers';
+import { sortedMembers, allCommittees, displayName } from '../data/boardMembers';
+import { useBoardMembers } from '../hooks/useBoardMembers';
+import Badge from '../components/ui/Badge';
 
 export default function Directory() {
+  const { members, source, isLoading } = useBoardMembers();
   const [search, setSearch] = useState('');
   const [committeeFilter, setCommitteeFilter] = useState('all');
   const [expandedId, setExpandedId] = useState(null);
 
-  const committees = useMemo(() => allCommittees(), []);
+  const committees = useMemo(() => allCommittees(members), [members]);
 
   const filteredMembers = useMemo(() => {
-    let members = sortedMembers(boardMembers.filter(m => m.status === 'active'));
+    let sorted = sortedMembers(members.filter(m => m.status === 'active'));
 
-    // Committee filter
     if (committeeFilter !== 'all') {
-      members = members.filter(m => m.committees.includes(committeeFilter));
+      sorted = sorted.filter(m => m.committees.includes(committeeFilter));
     }
 
-    // Search filter
     if (search.trim()) {
       const q = search.toLowerCase();
-      members = members.filter(m =>
+      sorted = sorted.filter(m =>
         displayName(m).toLowerCase().includes(q) ||
         m.organization.toLowerCase().includes(q) ||
         m.email.toLowerCase().includes(q) ||
@@ -29,11 +30,11 @@ export default function Directory() {
       );
     }
 
-    return members;
-  }, [search, committeeFilter]);
+    return sorted;
+  }, [members, search, committeeFilter]);
 
-  const activeCount = boardMembers.filter(m => m.status === 'active').length;
-  const officerCount = boardMembers.filter(m =>
+  const activeCount = members.filter(m => m.status === 'active').length;
+  const officerCount = members.filter(m =>
     ['President', 'Vice President', 'Treasurer', 'Secretary'].includes(m.title) && m.status === 'active'
   ).length;
 
@@ -44,8 +45,14 @@ export default function Directory() {
         <div>
           <h2 className="text-lg sm:text-xl font-bold text-dark">Board Directory</h2>
           <p className="text-sm text-med-gray mt-0.5">
-            {activeCount} active members · {officerCount} officers
+            {isLoading ? 'Loading...' : `${activeCount} active members · ${officerCount} officers`}
           </p>
+        </div>
+        <div className="flex items-center gap-1.5 text-[10px] text-med-gray">
+          {source === 'supabase'
+            ? <><Database className="w-3 h-3" /> Live from database</>
+            : <><HardDrive className="w-3 h-3" /> Local data</>
+          }
         </div>
       </div>
 
@@ -96,7 +103,9 @@ export default function Directory() {
         ) : (
           <div className="text-center py-12">
             <Users className="w-10 h-10 text-med-gray/40 mx-auto mb-3" />
-            <p className="text-sm text-med-gray">No members match your search.</p>
+            <p className="text-sm text-med-gray">
+              {isLoading ? 'Loading members...' : 'No members match your search.'}
+            </p>
           </div>
         )}
       </div>

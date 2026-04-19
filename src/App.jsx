@@ -4,6 +4,8 @@ import PasswordGate from './components/PasswordGate';
 import Layout from './components/Layout';
 import Dashboard from './pages/Dashboard';
 import Directory from './pages/Directory';
+import Documents from './pages/Documents';
+import MeetingDetail from './pages/MeetingDetail';
 import ComingSoon from './pages/ComingSoon';
 
 export default function App() {
@@ -17,7 +19,8 @@ export default function App() {
     <Routes>
       <Route element={<Layout onLogout={logout} />}>
         <Route index element={<Dashboard />} />
-        <Route path="documents" element={<ComingSoon title="Document Library" />} />
+        <Route path="documents" element={<Documents />} />
+        <Route path="meetings/:slug" element={<MeetingDetail />} />
         <Route path="meetings" element={<ComingSoon title="Meeting Calendar" />} />
         <Route path="directory" element={<Directory />} />
         <Route path="financials" element={<ComingSoon title="Financial Reports" />} />

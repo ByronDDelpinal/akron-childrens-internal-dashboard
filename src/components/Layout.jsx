@@ -15,7 +15,7 @@ import NavItem from './ui/NavItem';
 
 const navItems = [
   { to: '/', icon: LayoutDashboard, label: 'Dashboard' },
-  { to: '/documents', icon: FolderOpen, label: 'Documents', comingSoon: true },
+  { to: '/documents', icon: FolderOpen, label: 'Documents' },
   { to: '/meetings', icon: Calendar, label: 'Meetings', comingSoon: true },
   { to: '/directory', icon: Users, label: 'Directory' },
   { to: '/financials', icon: BarChart3, label: 'Financials', comingSoon: true },
