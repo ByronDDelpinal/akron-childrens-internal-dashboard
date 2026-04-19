@@ -1,0 +1,28 @@
+import { Routes, Route } from 'react-router-dom';
+import { useAuth } from './hooks/useAuth';
+import PasswordGate from './components/PasswordGate';
+import Layout from './components/Layout';
+import Dashboard from './pages/Dashboard';
+import ComingSoon from './pages/ComingSoon';
+
+export default function App() {
+  const { isAuthenticated, isLoading, error, login, logout } = useAuth();
+
+  if (!isAuthenticated) {
+    return <PasswordGate onLogin={login} isLoading={isLoading} error={error} />;
+  }
+
+  return (
+    <Routes>
+      <Route element={<Layout onLogout={logout} />}>
+        <Route index element={<Dashboard />} />
+        <Route path="documents" element={<ComingSoon title="Document Library" />} />
+        <Route path="meetings" element={<ComingSoon title="Meeting Calendar" />} />
+        <Route path="directory" element={<ComingSoon title="Board Directory" />} />
+        <Route path="financials" element={<ComingSoon title="Financial Reports" />} />
+        <Route path="proposals" element={<ComingSoon title="Proposals" />} />
+        <Route path="*" element={<ComingSoon title="Page Not Found" />} />
+      </Route>
+    </Routes>
+  );
+}

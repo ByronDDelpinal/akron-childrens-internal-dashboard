@@ -1,0 +1,78 @@
+@import "tailwindcss";
+
+/* ── ACM Brand Theme ── */
+@theme {
+  --color-teal: #00A89D;
+  --color-teal-dark: #008C83;
+  --color-teal-light: #E6F7F6;
+  --color-purple: #5B2D8E;
+  --color-purple-dark: #4A2473;
+  --color-purple-light: #F0EAF5;
+  --color-orange: #F7941D;
+  --color-red: #ED1C24;
+  --color-yellow: #FFF200;
+  --color-green: #00A651;
+  --color-blue: #00AEEF;
+  --color-pink: #EC008C;
+  --color-dark: #333333;
+  --color-med-gray: #666666;
+  --color-light-gray: #F5F5F5;
+  --color-border: #E5E7EB;
+  --font-sans: 'Inter', 'Arial', system-ui, sans-serif;
+  --font-display: 'Georgia', serif;
+}
+
+/* ── Rainbow Bar Gradient ── */
+.rainbow-bar {
+  height: 4px;
+  background: linear-gradient(
+    to right,
+    #ED1C24 0%,
+    #F7941D 16%,
+    #FFF200 32%,
+    #00A651 48%,
+    #00AEEF 64%,
+    #5B2D8E 80%,
+    #EC008C 100%
+  );
+}
+
+.rainbow-bar-thick {
+  height: 6px;
+  background: linear-gradient(
+    to right,
+    #ED1C24 0%,
+    #F7941D 16%,
+    #FFF200 32%,
+    #00A651 48%,
+    #00AEEF 64%,
+    #5B2D8E 80%,
+    #EC008C 100%
+  );
+}
+
+/* ── Base Styles ── */
+body {
+  font-family: var(--font-sans);
+  color: var(--color-dark);
+  background-color: #FAFAFA;
+  margin: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#root {
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── Recharts overrides ── */
+.recharts-cartesian-axis-tick-value {
+  font-size: 11px;
+  fill: #666666;
+}
+
+.recharts-tooltip-wrapper {
+  outline: none;
+}
