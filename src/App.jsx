@@ -3,6 +3,7 @@ import { useAuth } from './hooks/useAuth';
 import PasswordGate from './components/PasswordGate';
 import Layout from './components/Layout';
 import Dashboard from './pages/Dashboard';
+import Directory from './pages/Directory';
 import ComingSoon from './pages/ComingSoon';
 
 export default function App() {
@@ -18,7 +19,7 @@ export default function App() {
         <Route index element={<Dashboard />} />
         <Route path="documents" element={<ComingSoon title="Document Library" />} />
         <Route path="meetings" element={<ComingSoon title="Meeting Calendar" />} />
-        <Route path="directory" element={<ComingSoon title="Board Directory" />} />
+        <Route path="directory" element={<Directory />} />
         <Route path="financials" element={<ComingSoon title="Financial Reports" />} />
         <Route path="proposals" element={<ComingSoon title="Proposals" />} />
         <Route path="*" element={<ComingSoon title="Page Not Found" />} />
