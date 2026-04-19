@@ -5,6 +5,7 @@ import Layout from './components/Layout';
 import Dashboard from './pages/Dashboard';
 import Directory from './pages/Directory';
 import Documents from './pages/Documents';
+import Meetings from './pages/Meetings';
 import MeetingDetail from './pages/MeetingDetail';
 import ComingSoon from './pages/ComingSoon';
 
@@ -21,7 +22,7 @@ export default function App() {
         <Route index element={<Dashboard />} />
         <Route path="documents" element={<Documents />} />
         <Route path="meetings/:slug" element={<MeetingDetail />} />
-        <Route path="meetings" element={<ComingSoon title="Meeting Calendar" />} />
+        <Route path="meetings" element={<Meetings />} />
         <Route path="directory" element={<Directory />} />
         <Route path="financials" element={<ComingSoon title="Financial Reports" />} />
         <Route path="proposals" element={<ComingSoon title="Proposals" />} />
