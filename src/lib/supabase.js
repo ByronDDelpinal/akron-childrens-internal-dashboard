@@ -25,12 +25,15 @@ export async function validatePassword(password) {
       if (error) throw error;
       return data?.valid === true;
     } catch (err) {
-      console.error('Password validation failed:', err);
+      // Edge Function not deployed yet — fall back to dev password
+      console.warn('Edge Function unavailable, falling back to dev password:', err.message);
+      const devPassword = import.meta.env.VITE_DEV_PASSWORD;
+      if (devPassword) return password === devPassword;
       return false;
     }
   }
 
-  // Dev mode: accept the dev password from env, or any non-empty string
+  // No Supabase configured — use dev password
   const devPassword = import.meta.env.VITE_DEV_PASSWORD || 'acm2026';
   return password === devPassword;
 }
