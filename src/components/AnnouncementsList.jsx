@@ -1,5 +1,6 @@
 import { Bell, AlertTriangle, Plus } from 'lucide-react';
 import Card, { CardHeader } from './ui/Card';
+import ScrollFade from './ui/ScrollFade';
 import IconBox from './ui/IconBox';
 import Badge from './ui/Badge';
 import { formatDateShort } from '../lib/formatters';
@@ -22,7 +23,7 @@ export default function AnnouncementsList({ announcements, onAdd }) {
           </button>
         )}
       </CardHeader>
-      <div className="space-y-3 max-h-[320px] overflow-y-auto">
+      <ScrollFade>
         {announcements.length > 0 ? (
           announcements.map((item) => (
             <div key={item.id} className="flex gap-3">
@@ -47,7 +48,7 @@ export default function AnnouncementsList({ announcements, onAdd }) {
         ) : (
           <p className="text-sm text-med-gray text-center py-4">No announcements.</p>
         )}
-      </div>
+      </ScrollFade>
     </Card>
   );
 }

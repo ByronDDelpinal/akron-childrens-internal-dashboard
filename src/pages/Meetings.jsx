@@ -5,12 +5,14 @@ import {
   Clock,
   MapPin,
   Filter,
+  Plus,
   Database,
   HardDrive,
   ChevronRight,
 } from 'lucide-react';
 import IconBox from '../components/ui/IconBox';
 import Badge from '../components/ui/Badge';
+import AddMeetingForm from '../components/meetings/AddMeetingForm';
 import { useMeetings } from '../hooks/useMeetings';
 import { upcomingMeetings, pastMeetings, timeDisplay, typeLabel } from '../data/meetings';
 import { formatDateMedium, formatDateShort, daysUntil } from '../lib/formatters';
@@ -71,8 +73,9 @@ function MeetingRow({ meeting }) {
 }
 
 export default function Meetings() {
-  const { meetings, source, isLoading } = useMeetings();
+  const { meetings, source, isLoading, refetch } = useMeetings();
   const [typeFilter, setTypeFilter] = useState('all');
+  const [showAddForm, setShowAddForm] = useState(false);
 
   const upcoming = useMemo(() => {
     let list = upcomingMeetings(meetings);
@@ -104,21 +107,31 @@ export default function Meetings() {
         </div>
       </div>
 
-      {/* Filter bar */}
-      <div className="relative w-fit">
-        <Filter className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-med-gray pointer-events-none" />
-        <select
-          value={typeFilter}
-          onChange={(e) => setTypeFilter(e.target.value)}
-          className="pl-9 pr-8 py-2.5 rounded-lg border border-border bg-white
-                     text-sm text-dark appearance-none cursor-pointer
-                     focus:outline-none focus:ring-2 focus:ring-teal focus:border-transparent
-                     transition-all"
+      {/* Filter bar + Add button */}
+      <div className="flex items-center justify-between gap-3">
+        <div className="relative">
+          <Filter className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-med-gray pointer-events-none" />
+          <select
+            value={typeFilter}
+            onChange={(e) => setTypeFilter(e.target.value)}
+            className="pl-9 pr-8 py-2.5 rounded-lg border border-border bg-white
+                       text-sm text-dark appearance-none cursor-pointer
+                       focus:outline-none focus:ring-2 focus:ring-teal focus:border-transparent
+                       transition-all"
+          >
+            {typeFilters.map(([value, label]) => (
+              <option key={value} value={value}>{label}</option>
+            ))}
+          </select>
+        </div>
+        <button
+          onClick={() => setShowAddForm(true)}
+          className="flex items-center gap-1.5 px-3.5 py-2 text-sm font-medium text-white
+                     bg-teal rounded-lg hover:bg-teal-dark transition-colors"
         >
-          {typeFilters.map(([value, label]) => (
-            <option key={value} value={value}>{label}</option>
-          ))}
-        </select>
+          <Plus className="w-4 h-4" />
+          Add Meeting
+        </button>
       </div>
 
       {/* Upcoming */}
@@ -143,6 +156,14 @@ export default function Meetings() {
           <Calendar className="w-10 h-10 text-med-gray/40 mx-auto mb-3" />
           <p className="text-sm text-med-gray">No meetings found.</p>
         </div>
+      )}
+
+      {/* Add Meeting slide-over */}
+      {showAddForm && (
+        <AddMeetingForm
+          onClose={() => setShowAddForm(false)}
+          onSuccess={refetch}
+        />
       )}
     </div>
   );

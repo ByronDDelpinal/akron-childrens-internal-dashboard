@@ -1,5 +1,6 @@
-import { RefreshCw, FileText, Vote, Calendar, Zap } from 'lucide-react';
+import { FileText, Vote, Calendar, Zap } from 'lucide-react';
 import Card, { CardHeader } from './ui/Card';
+import ScrollFade from './ui/ScrollFade';
 import IconBox from './ui/IconBox';
 import { formatDateShort } from '../lib/formatters';
 
@@ -18,7 +19,7 @@ export default function UpdatesList({ updates }) {
   return (
     <Card>
       <CardHeader title="Recent Updates" />
-      <div className="space-y-3 max-h-[320px] overflow-y-auto">
+      <ScrollFade>
         {updates.length > 0 ? (
           updates.map((item) => {
             const cfg = sourceConfig[item.source] || sourceConfig.system;
@@ -43,7 +44,7 @@ export default function UpdatesList({ updates }) {
         ) : (
           <p className="text-sm text-med-gray text-center py-4">No recent updates.</p>
         )}
-      </div>
+      </ScrollFade>
     </Card>
   );
 }

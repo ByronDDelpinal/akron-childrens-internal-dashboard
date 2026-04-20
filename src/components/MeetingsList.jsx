@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { Calendar, MapPin, Clock } from 'lucide-react';
 import Card, { CardHeader } from './ui/Card';
+import ScrollFade from './ui/ScrollFade';
 import IconBox from './ui/IconBox';
 import { formatDateMedium, daysUntil } from '../lib/formatters';
 
@@ -12,7 +13,7 @@ export default function MeetingsList({ meetings }) {
   return (
     <Card>
       <CardHeader title="Upcoming Meetings" />
-      <div className="space-y-3">
+      <ScrollFade>
         {meetings.map((meeting) => (
           <Link
             key={meeting.id}
@@ -46,7 +47,7 @@ export default function MeetingsList({ meetings }) {
             </div>
           </Link>
         ))}
-      </div>
+      </ScrollFade>
     </Card>
   );
 }

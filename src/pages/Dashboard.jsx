@@ -14,8 +14,7 @@ import MeetingsList from '../components/MeetingsList';
 import AnnouncementsList from '../components/AnnouncementsList';
 import UpdatesList from '../components/UpdatesList';
 import AddAnnouncementForm from '../components/AddAnnouncementForm';
-import { revenueExpenseData, netAssetsData } from '../data/financials';
-import { quickStats } from '../data/dashboard';
+import { revenueExpenseData, netAssetsData, currentYear, fiscalYears } from '../data/financials';
 import { useMeetings } from '../hooks/useMeetings';
 import { useAnnouncements } from '../hooks/useAnnouncements';
 import { useUpdates } from '../hooks/useUpdates';
@@ -40,18 +39,18 @@ export default function Dashboard() {
       <div>
         <h2 className="text-lg sm:text-xl font-bold text-dark">Dashboard</h2>
         <p className="text-sm text-med-gray mt-0.5">
-          Overview based on the most recent filing ({quickStats.fiscalYear})
+          Financial data sourced from IRS Form 990 filings
         </p>
       </div>
 
       {/* Stat cards */}
       <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-3">
-        <StatCard icon={DollarSign} label="Revenue" value={formatDollarDetail(quickStats.currentFYRevenue)} subtext={quickStats.fiscalYear} />
-        <StatCard icon={TrendingUp} label="Net Assets" value={formatDollarDetail(quickStats.netAssets)} subtext="+1,002% since FY15" accent="purple" />
-        <StatCard icon={Building2} label="Total Assets" value={formatDollarDetail(quickStats.totalAssets)} subtext={quickStats.fiscalYear} />
-        <StatCard icon={Users} label="Employees" value={formatNumber(quickStats.employees)} subtext={quickStats.fiscalYear} />
-        <StatCard icon={Heart} label="Volunteers" value={formatNumber(quickStats.volunteers)} subtext="4× prior year" accent="purple" />
-        <StatCard icon={Ticket} label="Visitors" value={formatNumber(quickStats.visitors)} subtext={quickStats.fiscalYear} />
+        <StatCard icon={DollarSign} label="Revenue" value={formatDollarDetail(currentYear.revenue)} subtext={currentYear.fyFull} />
+        <StatCard icon={TrendingUp} label="Net Assets" value={formatDollarDetail(currentYear.netAssets)} subtext={`+${Math.round(((currentYear.netAssets - fiscalYears[0].netAssets) / fiscalYears[0].netAssets) * 100).toLocaleString()}% since ${fiscalYears[0].fy}`} accent="purple" />
+        <StatCard icon={Building2} label="Total Assets" value={formatDollarDetail(currentYear.assets)} subtext={currentYear.fyFull} />
+        <StatCard icon={Users} label="Employees" value={formatNumber(currentYear.employees)} subtext={currentYear.fyFull} />
+        <StatCard icon={Heart} label="Volunteers" value={formatNumber(currentYear.volunteers)} subtext={currentYear.fyFull} accent="purple" />
+        <StatCard icon={Ticket} label="Visitors" value={formatNumber(currentYear.visitors)} subtext={currentYear.fyFull} />
       </div>
 
       {/* Charts */}
