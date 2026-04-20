@@ -1,13 +1,11 @@
 /**
  * ACM Brand Design Tokens
  *
- * Single source of truth for all colors, fonts, and spacing.
- * Tailwind classes reference these via CSS custom properties in index.css.
- * JavaScript (e.g., Recharts props) imports from here.
+ * Single source of truth for all colors used in JavaScript-rendered
+ * elements (e.g., Recharts charts, programmatic avatar colors).
  *
- * To update the brand, change values here AND in the @theme block in index.css.
- * Both must stay in sync — the CSS @theme drives Tailwind utilities,
- * and this file drives JS-rendered elements like SVG charts.
+ * Tailwind utilities are driven by the @theme block in index.css.
+ * Both must stay in sync.
  */
 
 // ── Brand Colors ──
@@ -26,33 +24,12 @@ export const colors = {
   pink:        '#EC008C',
 };
 
-// ── Neutral Palette ──
-export const neutrals = {
-  dark:      '#333333',
-  medGray:   '#666666',
-  lightGray: '#F5F5F5',
-  border:    '#E5E7EB',
-  background:'#FAFAFA',
-  white:     '#FFFFFF',
-};
-
-// ── Rainbow Gradient (ordered stops for the brand bar) ──
-export const rainbowStops = [
-  { color: colors.red,    offset: '0%' },
-  { color: colors.orange, offset: '16%' },
-  { color: colors.yellow, offset: '32%' },
-  { color: colors.green,  offset: '48%' },
-  { color: colors.blue,   offset: '64%' },
-  { color: colors.purple, offset: '80%' },
-  { color: colors.pink,   offset: '100%' },
-];
-
 // ── Chart Theme (Recharts-specific) ──
 export const chartTheme = {
   primary:    colors.teal,
   secondary:  colors.purple,
-  gridStroke: neutrals.border,
-  tickFill:   neutrals.medGray,
+  gridStroke: '#E5E7EB',
+  tickFill:   '#666666',
   tickSize:   11,
   axisPadding: { top: 5, right: 5, bottom: 5, left: 0 },
   yAxisWidth: 50,
