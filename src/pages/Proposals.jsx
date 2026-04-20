@@ -22,15 +22,14 @@ import { useProposals, useUpdateProposalStatus } from '../hooks/useProposals';
 import { formatDateShort } from '../lib/formatters';
 
 const statusConfig = {
-  draft:     { label: 'Draft',     variant: 'default' },
   submitted: { label: 'Submitted', variant: 'info' },
   approved:  { label: 'Approved',  variant: 'success' },
   denied:    { label: 'Denied',    variant: 'important' },
 };
 
-const statusOptions = ['all', 'submitted', 'approved', 'denied', 'draft'];
+const statusOptions = ['all', 'submitted', 'approved', 'denied'];
 
-function ProposalCard({ proposal, onStatusChange, isUpdating }) {
+function ProposalCard({ proposal, onRequestStatusChange, isUpdating }) {
   const [showActions, setShowActions] = useState(false);
   const cfg = statusConfig[proposal.status] || statusConfig.submitted;
 
@@ -82,59 +81,53 @@ function ProposalCard({ proposal, onStatusChange, isUpdating }) {
         </div>
 
         {/* Status change dropdown */}
-        {(proposal.status === 'submitted' || proposal.status === 'draft') && (
-          <div className="relative shrink-0">
-            <button
-              onClick={() => setShowActions(!showActions)}
-              className="flex items-center gap-1 px-2.5 py-1.5 text-[11px] font-medium text-med-gray
-                         border border-border rounded-lg hover:bg-light-gray transition-colors"
-            >
-              Update
-              <ChevronDown className={`w-3 h-3 transition-transform ${showActions ? 'rotate-180' : ''}`} />
-            </button>
-            {showActions && (
-              <>
-                <div className="fixed inset-0 z-10" onClick={() => setShowActions(false)} />
-                <div className="absolute right-0 top-full mt-1 bg-white border border-border rounded-lg shadow-lg z-20 py-1 min-w-[140px]">
-                  {proposal.status === 'draft' && (
-                    <button
-                      onClick={() => { onStatusChange(proposal, 'submitted'); setShowActions(false); }}
-                      disabled={isUpdating}
-                      className="w-full text-left px-3 py-2 text-xs text-dark hover:bg-light-gray transition-colors flex items-center gap-2"
-                    >
-                      <FileText className="w-3 h-3 text-blue" />
-                      Mark Submitted
-                    </button>
-                  )}
+        <div className="relative shrink-0">
+          <button
+            onClick={() => setShowActions(!showActions)}
+            className="flex items-center gap-1 px-2.5 py-1.5 text-[11px] font-medium text-med-gray
+                       border border-border rounded-lg hover:bg-light-gray transition-colors"
+          >
+            {cfg.label}
+            <ChevronDown className={`w-3 h-3 transition-transform ${showActions ? 'rotate-180' : ''}`} />
+          </button>
+          {showActions && (
+            <>
+              <div className="fixed inset-0 z-10" onClick={() => setShowActions(false)} />
+              <div className="absolute right-0 top-full mt-1 bg-white border border-border rounded-lg shadow-lg z-20 py-1 min-w-[140px]">
+                {proposal.status !== 'submitted' && (
                   <button
-                    onClick={() => { onStatusChange(proposal, 'approved'); setShowActions(false); }}
+                    onClick={() => { onRequestStatusChange(proposal, 'submitted'); setShowActions(false); }}
+                    disabled={isUpdating}
+                    className="w-full text-left px-3 py-2 text-xs text-dark hover:bg-light-gray transition-colors flex items-center gap-2"
+                  >
+                    <FileText className="w-3 h-3 text-blue" />
+                    Revert to Submitted
+                  </button>
+                )}
+                {proposal.status !== 'approved' && (
+                  <button
+                    onClick={() => { onRequestStatusChange(proposal, 'approved'); setShowActions(false); }}
                     disabled={isUpdating}
                     className="w-full text-left px-3 py-2 text-xs text-dark hover:bg-light-gray transition-colors flex items-center gap-2"
                   >
                     <CheckCircle2 className="w-3 h-3 text-green" />
                     Approve
                   </button>
+                )}
+                {proposal.status !== 'denied' && (
                   <button
-                    onClick={() => { onStatusChange(proposal, 'denied'); setShowActions(false); }}
+                    onClick={() => { onRequestStatusChange(proposal, 'denied'); setShowActions(false); }}
                     disabled={isUpdating}
                     className="w-full text-left px-3 py-2 text-xs text-dark hover:bg-light-gray transition-colors flex items-center gap-2"
                   >
                     <XCircle className="w-3 h-3 text-red" />
                     Deny
                   </button>
-                </div>
-              </>
-            )}
-          </div>
-        )}
-
-        {/* Resolved status indicator */}
-        {proposal.status === 'approved' && (
-          <CheckCircle2 className="w-5 h-5 text-green shrink-0" />
-        )}
-        {proposal.status === 'denied' && (
-          <XCircle className="w-5 h-5 text-red shrink-0" />
-        )}
+                )}
+              </div>
+            </>
+          )}
+        </div>
       </div>
     </div>
   );
@@ -145,10 +138,19 @@ export default function Proposals() {
   const { updateStatus, isUpdating } = useUpdateProposalStatus();
   const [showSubmitForm, setShowSubmitForm] = useState(false);
   const [statusFilter, setStatusFilter] = useState('all');
+  const [pendingChange, setPendingChange] = useState(null); // { proposal, newStatus }
 
-  async function handleStatusChange(proposal, newStatus) {
-    const success = await updateStatus(proposal, newStatus);
-    if (success) refetch();
+  function requestStatusChange(proposal, newStatus) {
+    setPendingChange({ proposal, newStatus });
+  }
+
+  async function confirmStatusChange() {
+    if (!pendingChange) return;
+    const success = await updateStatus(pendingChange.proposal, pendingChange.newStatus);
+    if (success) {
+      setPendingChange(null);
+      refetch();
+    }
   }
 
   const filtered = useMemo(() => {
@@ -250,7 +252,7 @@ export default function Proposals() {
             <ProposalCard
               key={p.id}
               proposal={p}
-              onStatusChange={handleStatusChange}
+              onRequestStatusChange={requestStatusChange}
               isUpdating={isUpdating}
             />
           ))
@@ -271,6 +273,18 @@ export default function Proposals() {
         <SubmitProposalForm
           onClose={() => setShowSubmitForm(false)}
           onSuccess={refetch}
+        />
+      )}
+
+      {/* Status change confirmation modal */}
+      {pendingChange && (
+        <ConfirmModal
+          title={`${statusConfig[pendingChange.newStatus]?.label} this proposal?`}
+          message={`Are you sure you want to mark "${pendingChange.proposal.title}" as ${pendingChange.newStatus}? An announcement will be made to notify the board.`}
+          confirmLabel={statusConfig[pendingChange.newStatus]?.label}
+          onConfirm={confirmStatusChange}
+          onCancel={() => setPendingChange(null)}
+          isLoading={isUpdating}
         />
       )}
     </div>

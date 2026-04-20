@@ -4,7 +4,7 @@
 -- The full proposal lives in a Google Doc; this table tracks metadata.
 -- ══════════════════════════════════════════════════════════════
 
-create type proposal_status as enum ('draft', 'submitted', 'approved', 'denied');
+create type proposal_status as enum ('submitted', 'approved', 'denied');
 
 create table proposals (
   id                uuid primary key default gen_random_uuid(),
