@@ -93,7 +93,7 @@ export function useAddMeeting() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState(null);
 
-  async function addMeeting({ title, meetingType, meetingDate, startTime, endTime, location, description, committee }) {
+  async function addMeeting({ title, meetingType, meetingDate, startTime, endTime, location, description, committee, createAgenda = false }) {
     if (!supabase) {
       setError('Database connection unavailable.');
       return null;
@@ -122,6 +122,55 @@ export function useAddMeeting() {
         .single();
 
       if (insertErr) throw insertErr;
+
+      // Auto-create placeholder agenda document if requested
+      if (createAgenda) {
+        try {
+          const agendaTitle = `Agenda — ${title} (${meetingDate})`;
+
+          const { data: agendaDoc, error: agendaErr } = await supabase
+            .from('documents')
+            .insert({
+              title: agendaTitle,
+              description: `Placeholder agenda for ${title}. Replace with a link to the final agenda when ready.`,
+              category: 'agenda',
+              storage_type: 'external',
+              external_url: null,
+            })
+            .select()
+            .single();
+
+          if (agendaErr) throw agendaErr;
+
+          // Create placeholder minutes document
+          const minutesTitle = `Minutes — ${title} (${meetingDate})`;
+
+          const { data: minutesDoc, error: minutesErr } = await supabase
+            .from('documents')
+            .insert({
+              title: minutesTitle,
+              description: `Placeholder minutes for ${title}. Replace with a link to the approved minutes when ready.`,
+              category: 'minutes',
+              storage_type: 'external',
+              external_url: null,
+            })
+            .select()
+            .single();
+
+          if (minutesErr) throw minutesErr;
+
+          // Link both documents to this meeting
+          await supabase
+            .from('meeting_documents')
+            .insert([
+              { meeting_id: data.id, document_id: agendaDoc.id, sort_order: 0 },
+              { meeting_id: data.id, document_id: minutesDoc.id, sort_order: 1 },
+            ]);
+        } catch (placeholderErr) {
+          // Non-critical — log but don't fail the meeting creation
+          console.warn('Auto-placeholder creation failed:', placeholderErr.message);
+        }
+      }
 
       // Auto-create update entry
       await createUpdate({

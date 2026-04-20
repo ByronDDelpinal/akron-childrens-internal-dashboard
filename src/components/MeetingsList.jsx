@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Calendar, MapPin, Clock } from 'lucide-react';
+import { Calendar, MapPin, Clock, Plus } from 'lucide-react';
 import Card, { CardHeader } from './ui/Card';
 import ScrollFade from './ui/ScrollFade';
 import IconBox from './ui/IconBox';
@@ -10,10 +10,20 @@ import { getMeetingAccent } from '../lib/constants';
  * List of upcoming meetings.
  * Each meeting links to its detail view at /meetings/:slug.
  */
-export default function MeetingsList({ meetings }) {
+export default function MeetingsList({ meetings, onAdd }) {
   return (
     <Card>
-      <CardHeader title="Upcoming Meetings" />
+      <CardHeader title="Upcoming Meetings">
+        {onAdd && (
+          <button
+            onClick={onAdd}
+            className="flex items-center gap-1 text-xs font-medium text-teal hover:text-teal-dark transition-colors cursor-pointer"
+          >
+            <Plus className="w-3.5 h-3.5" />
+            Add
+          </button>
+        )}
+      </CardHeader>
       <ScrollFade>
         {meetings.map((meeting) => (
           <Link

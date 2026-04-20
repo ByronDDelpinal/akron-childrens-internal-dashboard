@@ -16,7 +16,7 @@ export default function AnnouncementsList({ announcements, onAdd }) {
         {onAdd && (
           <button
             onClick={onAdd}
-            className="flex items-center gap-1 text-xs font-medium text-teal hover:text-teal-dark transition-colors"
+            className="flex items-center gap-1 text-xs font-medium text-teal hover:text-teal-dark transition-colors cursor-pointer"
           >
             <Plus className="w-3.5 h-3.5" />
             Add

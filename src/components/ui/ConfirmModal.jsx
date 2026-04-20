@@ -1,18 +1,53 @@
+import { useState, useEffect, useCallback } from 'react';
 import { AlertTriangle, X } from 'lucide-react';
 
+const DURATION = 200; // ms
+
 /**
- * Confirmation modal with destructive action styling.
- * Used for delete operations that need clear user intent.
+ * Animated confirmation modal with destructive action styling.
+ * Fades + scales in on mount, reverses on close.
  */
 export default function ConfirmModal({ title, message, confirmLabel = 'Delete', onConfirm, onCancel, isLoading = false }) {
+  const [phase, setPhase] = useState('entering');
+
+  useEffect(() => {
+    const raf = requestAnimationFrame(() => setPhase('open'));
+    return () => cancelAnimationFrame(raf);
+  }, []);
+
+  const handleCancel = useCallback(() => {
+    if (phase === 'leaving') return;
+    setPhase('leaving');
+    setTimeout(onCancel, DURATION);
+  }, [onCancel, phase]);
+
+  const isVisible = phase === 'open';
+
   return (
     <>
       {/* Backdrop */}
-      <div className="fixed inset-0 bg-black/40 z-50" onClick={onCancel} />
+      <div
+        onClick={handleCancel}
+        className="fixed inset-0 z-50 transition-opacity"
+        style={{
+          backgroundColor: 'rgba(0,0,0,0.4)',
+          opacity: isVisible ? 1 : 0,
+          transitionDuration: `${DURATION}ms`,
+        }}
+      />
 
       {/* Modal */}
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-        <div className="bg-white rounded-xl shadow-xl max-w-sm w-full overflow-hidden">
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 pointer-events-none">
+        <div
+          className="bg-white rounded-xl shadow-xl max-w-sm w-full overflow-hidden pointer-events-auto
+                     transition-all"
+          style={{
+            opacity: isVisible ? 1 : 0,
+            transform: isVisible ? 'scale(1)' : 'scale(0.95)',
+            transitionDuration: `${DURATION}ms`,
+            transitionTimingFunction: 'cubic-bezier(0.32, 0.72, 0, 1)',
+          }}
+        >
           {/* Header */}
           <div className="flex items-start gap-3 p-5 pb-0">
             <div className="shrink-0 w-10 h-10 rounded-full bg-orange/10 flex items-center justify-center">
@@ -23,7 +58,7 @@ export default function ConfirmModal({ title, message, confirmLabel = 'Delete', 
               <p className="text-xs text-med-gray mt-1.5 leading-relaxed">{message}</p>
             </div>
             <button
-              onClick={onCancel}
+              onClick={handleCancel}
               className="shrink-0 p-1 rounded-lg hover:bg-light-gray transition-colors -mt-1 -mr-1"
             >
               <X className="w-4 h-4 text-med-gray" />
@@ -33,7 +68,7 @@ export default function ConfirmModal({ title, message, confirmLabel = 'Delete', 
           {/* Actions */}
           <div className="flex items-center justify-end gap-2 p-5">
             <button
-              onClick={onCancel}
+              onClick={handleCancel}
               className="px-4 py-2 text-sm text-med-gray hover:text-dark rounded-lg
                          hover:bg-light-gray transition-colors"
             >

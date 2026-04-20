@@ -53,6 +53,10 @@
 .rainbow-bar-thick { height: 6px; }
 
 /* ── Base Styles ── */
+button, [role="button"] {
+  cursor: pointer;
+}
+
 body {
   font-family: var(--font-sans);
   color: var(--color-dark);

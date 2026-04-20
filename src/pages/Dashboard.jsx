@@ -14,6 +14,8 @@ import MeetingsList from '../components/MeetingsList';
 import AnnouncementsList from '../components/AnnouncementsList';
 import UpdatesList from '../components/UpdatesList';
 import AddAnnouncementForm from '../components/AddAnnouncementForm';
+import AddMeetingForm from '../components/meetings/AddMeetingForm';
+import AddUpdateForm from '../components/AddUpdateForm';
 import { revenueExpenseData, netAssetsData, currentYear, fiscalYears } from '../data/financials';
 import { useMeetings } from '../hooks/useMeetings';
 import { useAnnouncements } from '../hooks/useAnnouncements';
@@ -22,10 +24,12 @@ import { upcomingMeetings, timeDisplay } from '../data/meetings';
 import { formatDollarDetail, formatNumber } from '../lib/formatters';
 
 export default function Dashboard() {
-  const { meetings } = useMeetings();
+  const { meetings, refetch: refetchMeetings } = useMeetings();
   const { announcements, refetch: refetchAnnouncements } = useAnnouncements();
-  const { updates } = useUpdates(5);
+  const { updates, refetch: refetchUpdates } = useUpdates(5);
   const [showAddAnnouncement, setShowAddAnnouncement] = useState(false);
+  const [showAddMeeting, setShowAddMeeting] = useState(false);
+  const [showAddUpdate, setShowAddUpdate] = useState(false);
 
   const upcoming = upcomingMeetings(meetings).slice(0, 4);
   const enriched = upcoming.map(m => ({
@@ -67,12 +71,12 @@ export default function Dashboard() {
 
       {/* Meetings + Announcements + Updates */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        <MeetingsList meetings={enriched} />
+        <MeetingsList meetings={enriched} onAdd={() => setShowAddMeeting(true)} />
         <AnnouncementsList
           announcements={announcements}
           onAdd={() => setShowAddAnnouncement(true)}
         />
-        <UpdatesList updates={updates} />
+        <UpdatesList updates={updates} onAdd={() => setShowAddUpdate(true)} />
       </div>
 
       {/* Add Announcement slide-over */}
@@ -80,6 +84,22 @@ export default function Dashboard() {
         <AddAnnouncementForm
           onClose={() => setShowAddAnnouncement(false)}
           onSuccess={refetchAnnouncements}
+        />
+      )}
+
+      {/* Add Meeting slide-over */}
+      {showAddMeeting && (
+        <AddMeetingForm
+          onClose={() => setShowAddMeeting(false)}
+          onSuccess={refetchMeetings}
+        />
+      )}
+
+      {/* Add Update slide-over */}
+      {showAddUpdate && (
+        <AddUpdateForm
+          onClose={() => setShowAddUpdate(false)}
+          onSuccess={refetchUpdates}
         />
       )}
     </div>

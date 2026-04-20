@@ -1,4 +1,4 @@
-import { FileText, Vote, Calendar, Zap } from 'lucide-react';
+import { FileText, Vote, Calendar, Zap, Plus } from 'lucide-react';
 import Card, { CardHeader } from './ui/Card';
 import ScrollFade from './ui/ScrollFade';
 import IconBox from './ui/IconBox';
@@ -15,10 +15,20 @@ const sourceConfig = {
  * List of recent auto-generated updates (document adds/deletes, proposal changes, etc.)
  * Receives updates array as a prop — no direct data imports.
  */
-export default function UpdatesList({ updates }) {
+export default function UpdatesList({ updates, onAdd }) {
   return (
     <Card>
-      <CardHeader title="Recent Updates" />
+      <CardHeader title="Recent Updates">
+        {onAdd && (
+          <button
+            onClick={onAdd}
+            className="flex items-center gap-1 text-xs font-medium text-teal hover:text-teal-dark transition-colors cursor-pointer"
+          >
+            <Plus className="w-3.5 h-3.5" />
+            Add
+          </button>
+        )}
+      </CardHeader>
       <ScrollFade>
         {updates.length > 0 ? (
           updates.map((item) => {

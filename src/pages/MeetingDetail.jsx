@@ -2,6 +2,7 @@ import { useParams, Link } from 'react-router-dom';
 import { useMemo, useState } from 'react';
 import {
   Calendar,
+  CalendarPlus,
   Clock,
   MapPin,
   ArrowLeft,
@@ -22,6 +23,7 @@ import { useMeetingDocuments } from '../hooks/useMeetingDocuments';
 import { useDeleteDocument } from '../hooks/useDeleteDocument';
 import { formatDateMedium } from '../lib/formatters';
 import { categoryLabels, getMeetingAccent } from '../lib/constants';
+import { googleCalendarUrl } from '../lib/calendar';
 import { timeDisplay, typeLabel } from '../data/meetings';
 
 function DocumentRow({ doc, onRequestDelete, isDeleting }) {
@@ -147,6 +149,19 @@ export default function MeetingDetail() {
           {meeting.description && (
             <p className="text-sm text-med-gray mt-3 leading-relaxed">{meeting.description}</p>
           )}
+          {!isPast && (
+            <a
+              href={googleCalendarUrl(meeting)}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 mt-3 px-3 py-1.5 text-xs font-medium
+                         text-teal border border-teal/30 rounded-lg
+                         hover:bg-teal-light/30 transition-colors"
+            >
+              <CalendarPlus className="w-3.5 h-3.5" />
+              Add to Google Calendar
+            </a>
+          )}
         </div>
       </div>
 
@@ -155,7 +170,7 @@ export default function MeetingDetail() {
         <CardHeader title="Meeting Documents">
           <button
             onClick={() => setShowAddForm(true)}
-            className="flex items-center gap-1 text-xs font-medium text-teal hover:text-teal-dark transition-colors"
+            className="flex items-center gap-1 text-xs font-medium text-teal hover:text-teal-dark transition-colors cursor-pointer"
           >
             <Plus className="w-3.5 h-3.5" />
             Add
