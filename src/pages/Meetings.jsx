@@ -9,6 +9,7 @@ import {
   Database,
   HardDrive,
   ChevronRight,
+  ChevronDown,
 } from 'lucide-react';
 import IconBox from '../components/ui/IconBox';
 import Badge from '../components/ui/Badge';
@@ -25,6 +26,8 @@ const typeFilters = [
   ['special', 'Special'],
 ];
 
+const PAST_PAGE_SIZE = 10;
+
 function MeetingRow({ meeting }) {
   const time = timeDisplay(meeting);
   const isPast = new Date(meeting.meetingDate + 'T23:59:59') < new Date();
@@ -32,17 +35,19 @@ function MeetingRow({ meeting }) {
   return (
     <Link
       to={`/meetings/${meeting.id}`}
-      className="flex items-center gap-3 p-4 bg-white rounded-xl border border-border
-                 hover:shadow-sm hover:border-teal/30 transition-all group"
+      className={`flex items-center gap-3 p-4 rounded-xl border border-border
+                 hover:shadow-sm hover:border-teal/30 transition-all group
+                 ${meeting.isCancelled ? 'bg-light-gray/60 opacity-60' : 'bg-white'}`}
     >
       <IconBox
         icon={Calendar}
-        accent={getMeetingAccent(meeting.meetingType)}
+        accent={meeting.isCancelled ? 'orange' : getMeetingAccent(meeting.meetingType)}
         size="sm"
       />
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-2 flex-wrap">
-          <p className="text-sm font-medium text-dark group-hover:text-teal transition-colors">
+          <p className={`text-sm font-medium group-hover:text-teal transition-colors
+            ${meeting.isCancelled ? 'text-med-gray line-through' : 'text-dark'}`}>
             {meeting.title}
           </p>
           <Badge variant={meeting.meetingType === 'full_board' ? 'info' : 'default'}>
@@ -77,6 +82,7 @@ export default function Meetings() {
   const { meetings, source, isLoading, refetch } = useMeetings();
   const [typeFilter, setTypeFilter] = useState('all');
   const [showAddForm, setShowAddForm] = useState(false);
+  const [pastVisible, setPastVisible] = useState(PAST_PAGE_SIZE);
 
   const upcoming = useMemo(() => {
     let list = upcomingMeetings(meetings);
@@ -89,6 +95,15 @@ export default function Meetings() {
     if (typeFilter !== 'all') list = list.filter(m => m.meetingType === typeFilter);
     return list;
   }, [meetings, typeFilter]);
+
+  // Reset pagination when filter changes
+  const pastPage = past.slice(0, pastVisible);
+  const hasMorePast = past.length > pastVisible;
+  const remaining = past.length - pastVisible;
+
+  function showMore() {
+    setPastVisible(v => v + PAST_PAGE_SIZE);
+  }
 
   return (
     <div className="p-4 sm:p-6 max-w-4xl mx-auto space-y-5">
@@ -114,7 +129,7 @@ export default function Meetings() {
           <Filter className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-med-gray pointer-events-none" />
           <select
             value={typeFilter}
-            onChange={(e) => setTypeFilter(e.target.value)}
+            onChange={(e) => { setTypeFilter(e.target.value); setPastVisible(PAST_PAGE_SIZE); }}
             className="pl-9 pr-8 py-2.5 rounded-lg border border-border bg-white
                        text-sm text-dark appearance-none cursor-pointer
                        focus:outline-none focus:ring-2 focus:ring-teal focus:border-transparent
@@ -143,11 +158,30 @@ export default function Meetings() {
         </div>
       )}
 
-      {/* Past */}
-      {past.length > 0 && (
+      {/* Past (paginated) */}
+      {pastPage.length > 0 && (
         <div className="space-y-2">
-          <h3 className="text-xs font-semibold text-med-gray uppercase tracking-wider">Past</h3>
-          {past.map(m => <MeetingRow key={m.id} meeting={m} />)}
+          <h3 className="text-xs font-semibold text-med-gray uppercase tracking-wider">
+            Past
+            {past.length > PAST_PAGE_SIZE && (
+              <span className="ml-1.5 font-normal normal-case tracking-normal text-med-gray/70">
+                · showing {pastPage.length} of {past.length}
+              </span>
+            )}
+          </h3>
+          {pastPage.map(m => <MeetingRow key={m.id} meeting={m} />)}
+
+          {hasMorePast && (
+            <button
+              onClick={showMore}
+              className="flex items-center justify-center gap-1.5 w-full py-2.5 text-sm font-medium
+                         text-teal border border-border rounded-xl
+                         hover:bg-teal-light/30 hover:border-teal/30 transition-colors"
+            >
+              <ChevronDown className="w-4 h-4" />
+              Show More ({remaining > PAST_PAGE_SIZE ? PAST_PAGE_SIZE : remaining} more)
+            </button>
+          )}
         </div>
       )}
 

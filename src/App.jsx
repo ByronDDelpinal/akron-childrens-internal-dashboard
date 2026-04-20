@@ -8,6 +8,7 @@ import Documents from './pages/Documents';
 import Meetings from './pages/Meetings';
 import MeetingDetail from './pages/MeetingDetail';
 import Proposals from './pages/Proposals';
+import FAQ from './pages/FAQ';
 import ComingSoon from './pages/ComingSoon';
 
 export default function App() {
@@ -26,6 +27,7 @@ export default function App() {
         <Route path="meetings" element={<Meetings />} />
         <Route path="directory" element={<Directory />} />
         <Route path="proposals" element={<Proposals />} />
+        <Route path="faq" element={<FAQ />} />
         <Route path="financials" element={<ComingSoon title="Financial Reports" />} />
         <Route path="*" element={<ComingSoon title="Page Not Found" />} />
       </Route>

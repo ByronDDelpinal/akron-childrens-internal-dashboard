@@ -11,12 +11,14 @@ import {
   Download,
   FolderOpen,
   Plus,
+  Pencil,
   Trash2,
 } from 'lucide-react';
 import Card, { CardHeader } from '../components/ui/Card';
 import Badge from '../components/ui/Badge';
 import IconBox from '../components/ui/IconBox';
 import AddDocumentForm from '../components/documents/AddDocumentForm';
+import EditMeetingForm from '../components/meetings/EditMeetingForm';
 import ConfirmModal from '../components/ui/ConfirmModal';
 import { useMeetings } from '../hooks/useMeetings';
 import { useMeetingDocuments } from '../hooks/useMeetingDocuments';
@@ -74,10 +76,11 @@ function DocumentRow({ doc, onRequestDelete, isDeleting }) {
 
 export default function MeetingDetail() {
   const { slug } = useParams();
-  const { meetings } = useMeetings();
+  const { meetings, refetch: refetchMeetings } = useMeetings();
   const { documents, isLoading: docsLoading, refetch } = useMeetingDocuments(slug);
   const { deleteDocument, isDeleting } = useDeleteDocument();
   const [showAddForm, setShowAddForm] = useState(false);
+  const [showEditForm, setShowEditForm] = useState(false);
   const [docToDelete, setDocToDelete] = useState(null);
 
   async function confirmDelete() {
@@ -149,19 +152,30 @@ export default function MeetingDetail() {
           {meeting.description && (
             <p className="text-sm text-med-gray mt-3 leading-relaxed">{meeting.description}</p>
           )}
-          {!isPast && (
-            <a
-              href={googleCalendarUrl(meeting)}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 mt-3 px-3 py-1.5 text-xs font-medium
-                         text-teal border border-teal/30 rounded-lg
-                         hover:bg-teal-light/30 transition-colors"
+          <div className="flex flex-wrap items-center gap-2 mt-3">
+            {!isPast && (
+              <a
+                href={googleCalendarUrl(meeting)}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium
+                           text-teal border border-teal/30 rounded-lg
+                           hover:bg-teal-light/30 transition-colors"
+              >
+                <CalendarPlus className="w-3.5 h-3.5" />
+                Add to Google Calendar
+              </a>
+            )}
+            <button
+              onClick={() => setShowEditForm(true)}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium
+                         text-med-gray border border-border rounded-lg
+                         hover:text-teal hover:border-teal/30 hover:bg-teal-light/30 transition-colors"
             >
-              <CalendarPlus className="w-3.5 h-3.5" />
-              Add to Google Calendar
-            </a>
-          )}
+              <Pencil className="w-3.5 h-3.5" />
+              Edit Meeting
+            </button>
+          </div>
         </div>
       </div>
 
@@ -198,6 +212,15 @@ export default function MeetingDetail() {
           onClose={() => setShowAddForm(false)}
           onSuccess={refetch}
           preselectedMeetingSlug={slug}
+        />
+      )}
+
+      {/* Edit Meeting slide-over */}
+      {showEditForm && (
+        <EditMeetingForm
+          meeting={meeting}
+          onClose={() => setShowEditForm(false)}
+          onSuccess={refetchMeetings}
         />
       )}
 

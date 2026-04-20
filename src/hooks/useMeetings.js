@@ -191,3 +191,61 @@ export function useAddMeeting() {
 
   return { addMeeting, isSubmitting, error };
 }
+
+/**
+ * Updates an existing meeting in Supabase by slug.
+ * Only sends changed fields to avoid unnecessary writes.
+ */
+export function useUpdateMeeting() {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState(null);
+
+  async function updateMeeting(slug, fields) {
+    if (!supabase) {
+      setError('Database connection unavailable.');
+      return false;
+    }
+
+    setIsSubmitting(true);
+    setError(null);
+
+    try {
+      const payload = {};
+
+      if (fields.title !== undefined) payload.title = fields.title;
+      if (fields.meetingDate !== undefined) payload.meeting_date = fields.meetingDate;
+      if (fields.startTime !== undefined) payload.start_time = fields.startTime || null;
+      if (fields.endTime !== undefined) payload.end_time = fields.endTime || null;
+      if (fields.location !== undefined) payload.location = fields.location || null;
+      if (fields.description !== undefined) payload.description = fields.description || null;
+      if (fields.isCancelled !== undefined) payload.is_cancelled = fields.isCancelled;
+
+      const { error: updateErr } = await supabase
+        .from('meetings')
+        .update(payload)
+        .eq('slug', slug);
+
+      if (updateErr) throw updateErr;
+
+      // Auto-create update entry
+      const action = fields.isCancelled ? 'cancelled' : 'updated';
+      await createUpdate({
+        title: `Meeting ${action}: ${fields.title || slug}`,
+        summary: fields.isCancelled
+          ? `${fields.title || slug} has been cancelled.`
+          : `${fields.title || slug} details have been updated.`,
+        source: 'meeting',
+      });
+
+      return true;
+    } catch (err) {
+      console.error('Failed to update meeting:', err.message);
+      setError(err.message);
+      return false;
+    } finally {
+      setIsSubmitting(false);
+    }
+  }
+
+  return { updateMeeting, isSubmitting, error };
+}

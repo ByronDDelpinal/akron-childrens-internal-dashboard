@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { Calendar, MapPin, Clock, Plus } from 'lucide-react';
 import Card, { CardHeader } from './ui/Card';
 import ScrollFade from './ui/ScrollFade';
+import Badge from './ui/Badge';
 import IconBox from './ui/IconBox';
 import { formatDateMedium, daysUntil } from '../lib/formatters';
 import { getMeetingAccent } from '../lib/constants';
@@ -9,6 +10,7 @@ import { getMeetingAccent } from '../lib/constants';
 /**
  * List of upcoming meetings.
  * Each meeting links to its detail view at /meetings/:slug.
+ * Cancelled meetings are shown with reduced opacity and a badge.
  */
 export default function MeetingsList({ meetings, onAdd }) {
   return (
@@ -29,18 +31,23 @@ export default function MeetingsList({ meetings, onAdd }) {
           <Link
             key={meeting.id}
             to={`/meetings/${meeting.id}`}
-            className="flex gap-3 p-3 rounded-lg bg-light-gray/60 border border-border/50
-                       hover:border-teal/30 hover:bg-teal-light/20 transition-all group"
+            className={`flex gap-3 p-3 rounded-lg border border-border/50
+                       hover:border-teal/30 hover:bg-teal-light/20 transition-all group
+                       ${meeting.isCancelled ? 'bg-light-gray/30 opacity-60' : 'bg-light-gray/60'}`}
           >
             <IconBox
               icon={Calendar}
-              accent={getMeetingAccent(meeting.meetingType)}
+              accent={meeting.isCancelled ? 'orange' : getMeetingAccent(meeting.meetingType)}
             />
             <div className="min-w-0 flex-1">
               <div className="flex items-start justify-between gap-2">
-                <p className="text-sm font-medium text-dark leading-snug group-hover:text-teal transition-colors">
-                  {meeting.title}
-                </p>
+                <div className="flex items-center gap-1.5 min-w-0">
+                  <p className={`text-sm font-medium leading-snug group-hover:text-teal transition-colors truncate
+                    ${meeting.isCancelled ? 'text-med-gray line-through' : 'text-dark'}`}>
+                    {meeting.title}
+                  </p>
+                  {meeting.isCancelled && <Badge variant="important">Cancelled</Badge>}
+                </div>
                 <span className="shrink-0 text-xs text-med-gray bg-white px-2 py-0.5 rounded-full border border-border">
                   {daysUntil(meeting.meetingDate)}
                 </span>

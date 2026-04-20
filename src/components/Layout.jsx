@@ -8,6 +8,7 @@ import {
   Users,
   BarChart3,
   FileText,
+  HelpCircle,
   Menu,
   X,
   LogOut,
@@ -21,6 +22,7 @@ const navItems = [
   { to: '/directory', icon: Users, label: 'Directory' },
   { to: '/financials', icon: BarChart3, label: 'Financials', comingSoon: true },
   { to: '/proposals', icon: FileText, label: 'Proposals' },
+  { to: '/faq', icon: HelpCircle, label: 'FAQ' },
 ];
 
 function BrandMark() {

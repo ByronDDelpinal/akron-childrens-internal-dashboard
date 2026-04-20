@@ -134,17 +134,17 @@ export default meetings;
 
 // ── Helpers ──────────────────────────────────────────────────
 
-/** Upcoming meetings sorted by date (nearest first). */
+/** Upcoming meetings sorted by date (nearest first). Includes cancelled meetings. */
 export function upcomingMeetings(list, fromDate = new Date().toISOString().slice(0, 10)) {
   return list
-    .filter(m => m.meetingDate >= fromDate && !m.isCancelled)
+    .filter(m => m.meetingDate >= fromDate)
     .sort((a, b) => a.meetingDate.localeCompare(b.meetingDate));
 }
 
-/** Past meetings sorted by date (most recent first). */
+/** Past meetings sorted by date (most recent first). Includes cancelled meetings. */
 export function pastMeetings(list, fromDate = new Date().toISOString().slice(0, 10)) {
   return list
-    .filter(m => m.meetingDate < fromDate && !m.isCancelled)
+    .filter(m => m.meetingDate < fromDate)
     .sort((a, b) => b.meetingDate.localeCompare(a.meetingDate));
 }
 
