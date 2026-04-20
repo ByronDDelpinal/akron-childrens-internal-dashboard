@@ -1,16 +1,177 @@
-# React + Vite
+# Board Portal
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A modern, mobile-friendly web portal for nonprofit board of directors. Built for the [Akron Children's Museum](https://akronkids.org), designed to be forked and adapted by any organization that needs a better way to keep their board organized.
 
-Currently, two official plugins are available:
+**If your nonprofit board is drowning in email threads, scattered Google Drive links, and "can you resend that attachment?" messages — this project is for you.** Fork it, swap in your data, and give your board a real home base.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## What It Does
 
-## React Compiler
+The portal replaces the chaos of email-and-Drive board management with a single, clean dashboard. Board members log in with a shared password and get immediate access to everything they need:
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- **Dashboard** with upcoming meetings, announcements, recent updates, and financial overview charts sourced from IRS 990 filings
+- **Meetings** page with upcoming/past views, type filtering, pagination, and one-click Google Calendar integration
+- **Meeting detail** pages with attached documents (agendas, minutes, board packets) and inline editing
+- **Document library** with search, category filters, and links to external files (Google Drive, Dropbox, etc.)
+- **Board directory** with contact info, committee assignments, term tracking, and expiration warnings
+- **Proposals** workflow for submitting and tracking board action items with status management
+- **Announcements** for manual posts and auto-generated activity updates
+- **FAQ** page to help board members navigate the portal during the transition
 
-## Expanding the ESLint configuration
+Every create/update/delete action automatically posts to an activity feed so the board stays informed without extra effort.
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## Tech Stack
+
+This is a straightforward React SPA — no framework magic, no build complexity:
+
+- **React 19** + **React Router 7** for UI and routing
+- **Vite 8** for dev server and builds
+- **Tailwind CSS 4** for styling (utility-first, no custom CSS files)
+- **Supabase** for database (Postgres), auth (Edge Functions), and row-level security
+- **Recharts** for financial data visualization
+- **Lucide React** for icons
+- **Vercel** for hosting (any static host works)
+
+No state management library. No CSS-in-JS. No GraphQL. Just React hooks, Supabase queries, and Tailwind classes.
+
+## Getting Started
+
+### Prerequisites
+
+- Node.js 18+
+- A [Supabase](https://supabase.com) project (free tier works fine)
+
+### 1. Clone and install
+
+```bash
+git clone <your-repo-url>
+cd acm-internal-dashboard
+npm install
+```
+
+### 2. Set up environment variables
+
+Copy the example env file and fill in your Supabase credentials:
+
+```bash
+cp .env.example .env
+```
+
+```env
+VITE_SUPABASE_URL=https://your-project.supabase.co
+VITE_SUPABASE_ANON_KEY=your-anon-key-here
+VITE_DEV_PASSWORD=yourdevpassword
+```
+
+The `VITE_DEV_PASSWORD` lets you log in during local development without needing the Supabase Edge Function deployed.
+
+### 3. Set up the database
+
+Run the SQL migrations in order against your Supabase project. You can do this through the Supabase SQL Editor or the CLI:
+
+```
+supabase/migrations/
+  001_board_members.sql       # Creates board_members table
+  002_seed_board_members.sql  # Seeds the roster (swap in your people)
+  003_meetings.sql            # Creates meetings table
+  004_documents.sql           # Creates documents + meeting_documents tables
+  005_seed_meetings.sql       # Seeds the meeting schedule (swap in your dates)
+  006_document_write_policies.sql
+  007_announcements.sql       # Creates announcements table
+  008_proposals.sql           # Creates proposals table
+  009_updates.sql             # Creates updates table
+  010_meeting_write_policies.sql
+```
+
+Run them in order (001 through 010). The seed files (002, 005) contain our data — replace the values with your own board members and meeting schedule.
+
+### 4. Set up the password gate
+
+The portal uses a shared password for simple access control. Generate a bcrypt hash:
+
+```bash
+node scripts/generate-hash.mjs
+```
+
+Then set it as a Supabase secret:
+
+```bash
+supabase secrets set BOARD_PASSWORD_HASH='your-hash-here'
+```
+
+You'll also need to deploy the `validate-password` Edge Function. See the Supabase docs on [Edge Functions](https://supabase.com/docs/guides/functions) for deployment steps.
+
+### 5. Run it
+
+```bash
+npm run dev
+```
+
+Open [http://localhost:5173](http://localhost:5173) and log in with your dev password.
+
+## Project Structure
+
+```
+src/
+  pages/          # One file per route (Dashboard, Meetings, Directory, etc.)
+  components/     # Reusable UI organized by feature
+    ui/           # Generic primitives (Card, Badge, SlideOver, etc.)
+    meetings/     # Meeting-specific forms
+    documents/    # Document-specific forms
+    proposals/    # Proposal-specific forms
+    directory/    # Board member card and avatar
+  hooks/          # Data fetching and mutations (one hook per Supabase table)
+  data/           # Helper functions for sorting, filtering, formatting
+  lib/            # Supabase client, design tokens, formatters, constants
+supabase/
+  migrations/     # SQL schema + seed data (run these to set up your DB)
+scripts/
+  generate-hash.mjs  # CLI tool for generating the portal password hash
+```
+
+The architecture is intentionally flat. Pages fetch data via hooks, render components, and manage local UI state. There's no global state management — each hook talks directly to Supabase.
+
+## Deploying
+
+The app builds to static files. Deploy anywhere that serves HTML:
+
+```bash
+npm run build
+```
+
+For Vercel (what we use), just connect your repo and it auto-deploys. The included `vercel.json` handles SPA routing.
+
+For other hosts (Netlify, Cloudflare Pages, etc.), make sure all routes redirect to `index.html` for client-side routing to work.
+
+## Adapting This for Your Organization
+
+This was built for a children's museum board, but the bones are generic. Here's what to change to make it yours:
+
+1. **Brand colors**: Update the `@theme` block in `src/index.css` and the matching values in `src/lib/tokens.js`. The whole app will follow.
+
+2. **Board members**: Edit `supabase/migrations/002_seed_board_members.sql` with your roster, then run it against your database.
+
+3. **Meeting schedule**: Edit `supabase/migrations/005_seed_meetings.sql` with your dates and cadence.
+
+4. **Financial data**: Replace `src/data/financials.js` with your organization's 990 filing data (or remove the financial charts from the Dashboard if you don't need them).
+
+5. **FAQ content**: Update the questions and answers in `src/pages/FAQ.jsx` to match your organization's context.
+
+6. **Logo and name**: Replace references to "Akron Children's Museum" in the Layout component and anywhere else they appear.
+
+The password gate, meeting/document/proposal workflows, and auto-update system all work out of the box regardless of the organization.
+
+## Why We Built This
+
+Nonprofit boards run on volunteer time. Every minute a board member spends hunting for a meeting agenda in their email or asking "where's the latest budget?" is a minute not spent on the mission.
+
+We built this because the existing tools (email threads, shared Google Drive folders, group texts) stopped scaling as the board grew. The portal doesn't replace those tools — it organizes them into one place so nothing gets lost.
+
+If your board is in the same boat, please take this and make it your own. Nonprofit technology shouldn't be a luxury.
+
+## Contributing
+
+Found a bug? Have an idea? Open an issue or submit a pull request. This is a community project and contributions are welcome.
+
+## License
+
+MIT — use it however you'd like, no strings attached.
