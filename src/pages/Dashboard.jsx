@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import {
   DollarSign,
   TrendingUp,
@@ -11,18 +12,20 @@ import RevenueChart from '../components/RevenueChart';
 import NetAssetsChart from '../components/NetAssetsChart';
 import MeetingsList from '../components/MeetingsList';
 import AnnouncementsList from '../components/AnnouncementsList';
+import AddAnnouncementForm from '../components/AddAnnouncementForm';
 import { revenueExpenseData, netAssetsData } from '../data/financials';
-import { quickStats, announcements } from '../data/dashboard';
+import { quickStats } from '../data/dashboard';
 import { useMeetings } from '../hooks/useMeetings';
-import { upcomingMeetings } from '../data/meetings';
+import { useAnnouncements } from '../hooks/useAnnouncements';
+import { upcomingMeetings, timeDisplay } from '../data/meetings';
 import { formatDollarDetail, formatNumber } from '../lib/formatters';
-import { timeDisplay } from '../data/meetings';
 
 export default function Dashboard() {
   const { meetings } = useMeetings();
-  const upcoming = upcomingMeetings(meetings).slice(0, 4);
+  const { announcements, refetch: refetchAnnouncements } = useAnnouncements();
+  const [showAddAnnouncement, setShowAddAnnouncement] = useState(false);
 
-  // Enrich meetings with a display-ready time string
+  const upcoming = upcomingMeetings(meetings).slice(0, 4);
   const enriched = upcoming.map(m => ({
     ...m,
     time: timeDisplay(m),
@@ -63,8 +66,19 @@ export default function Dashboard() {
       {/* Meetings + Announcements */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <MeetingsList meetings={enriched} />
-        <AnnouncementsList announcements={announcements} />
+        <AnnouncementsList
+          announcements={announcements}
+          onAdd={() => setShowAddAnnouncement(true)}
+        />
       </div>
+
+      {/* Add Announcement slide-over */}
+      {showAddAnnouncement && (
+        <AddAnnouncementForm
+          onClose={() => setShowAddAnnouncement(false)}
+          onSuccess={refetchAnnouncements}
+        />
+      )}
     </div>
   );
 }

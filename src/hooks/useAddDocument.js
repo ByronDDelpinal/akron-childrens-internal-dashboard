@@ -62,6 +62,18 @@ export function useAddDocument() {
         }
       }
 
+      // 3. Auto-create a low-priority announcement
+      await supabase
+        .from('announcements')
+        .insert({
+          title: `New document added: ${title}`,
+          summary: description || `A new ${category.replace(/_/g, ' ')} has been added to the document library.`,
+          priority: 'normal',
+        })
+        .then(({ error: annErr }) => {
+          if (annErr) console.warn('Auto-announcement failed:', annErr.message);
+        });
+
       return doc;
     } catch (err) {
       console.error('Failed to add document:', err.message);
