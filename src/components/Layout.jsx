@@ -19,7 +19,7 @@ const navItems = [
   { to: '/meetings', icon: Calendar, label: 'Meetings' },
   { to: '/directory', icon: Users, label: 'Directory' },
   { to: '/financials', icon: BarChart3, label: 'Financials', comingSoon: true },
-  { to: '/proposals', icon: FileText, label: 'Proposals', comingSoon: true },
+  { to: '/proposals', icon: FileText, label: 'Proposals' },
 ];
 
 function BrandMark() {
