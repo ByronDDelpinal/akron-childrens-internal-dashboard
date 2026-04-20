@@ -16,6 +16,7 @@ import Card, { CardHeader } from '../components/ui/Card';
 import Badge from '../components/ui/Badge';
 import IconBox from '../components/ui/IconBox';
 import AddDocumentForm from '../components/documents/AddDocumentForm';
+import ConfirmModal from '../components/ui/ConfirmModal';
 import { useMeetings } from '../hooks/useMeetings';
 import { useMeetingDocuments } from '../hooks/useMeetingDocuments';
 import { useDeleteDocument } from '../hooks/useDeleteDocument';
@@ -35,17 +36,9 @@ const categoryLabels = {
   other: 'Other',
 };
 
-function DocumentRow({ doc, onDelete, isDeleting }) {
+function DocumentRow({ doc, onRequestDelete, isDeleting }) {
   const isExternal = doc.storageType === 'external';
   const href = isExternal ? doc.externalUrl : doc.storagePath;
-
-  function handleDelete(e) {
-    e.preventDefault();
-    e.stopPropagation();
-    if (window.confirm(`Delete "${doc.title}"? This cannot be undone.`)) {
-      onDelete(doc);
-    }
-  }
 
   return (
     <div className="flex items-center gap-3 p-3 rounded-lg bg-light-gray/60 border border-border/50 group">
@@ -76,7 +69,7 @@ function DocumentRow({ doc, onDelete, isDeleting }) {
         )}
       </a>
       <button
-        onClick={handleDelete}
+        onClick={() => onRequestDelete(doc)}
         disabled={isDeleting}
         className="p-1.5 rounded-lg text-med-gray hover:text-orange hover:bg-orange/10
                    transition-colors opacity-0 group-hover:opacity-100 shrink-0
@@ -95,10 +88,14 @@ export default function MeetingDetail() {
   const { documents, isLoading: docsLoading, refetch } = useMeetingDocuments(slug);
   const { deleteDocument, isDeleting } = useDeleteDocument();
   const [showAddForm, setShowAddForm] = useState(false);
+  const [docToDelete, setDocToDelete] = useState(null);
 
-  async function handleDelete(doc) {
-    const success = await deleteDocument(doc);
-    if (success) refetch();
+  async function confirmDelete() {
+    const success = await deleteDocument(docToDelete);
+    if (success) {
+      setDocToDelete(null);
+      refetch();
+    }
   }
 
   const meeting = useMemo(
@@ -181,7 +178,7 @@ export default function MeetingDetail() {
         ) : documents.length > 0 ? (
           <div className="space-y-2">
             {documents.map(doc => (
-              <DocumentRow key={doc.id} doc={doc} onDelete={handleDelete} isDeleting={isDeleting} />
+              <DocumentRow key={doc.id} doc={doc} onRequestDelete={setDocToDelete} isDeleting={isDeleting} />
             ))}
           </div>
         ) : (
@@ -198,6 +195,18 @@ export default function MeetingDetail() {
           onClose={() => setShowAddForm(false)}
           onSuccess={refetch}
           preselectedMeetingSlug={slug}
+        />
+      )}
+
+      {/* Delete confirmation modal */}
+      {docToDelete && (
+        <ConfirmModal
+          title={`Delete "${docToDelete.title}"?`}
+          message="Are you sure you want to delete this? It will be unavailable for everyone, and an announcement will be made."
+          confirmLabel="Delete Document"
+          onConfirm={confirmDelete}
+          onCancel={() => setDocToDelete(null)}
+          isLoading={isDeleting}
         />
       )}
     </div>
