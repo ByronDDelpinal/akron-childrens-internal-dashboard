@@ -1,7 +1,8 @@
-import { Mail, Phone, Building2, Clock } from 'lucide-react';
+import { Mail, Phone, Building2, Clock, Download } from 'lucide-react';
 import MemberAvatar from './MemberAvatar';
 import Badge from '../ui/Badge';
 import { displayName, termDisplay, isTermExpiringSoon, committeeRole } from '../../data/boardMembers';
+import { downloadVCard } from '../../data/vcard';
 
 /**
  * Expandable board member card.
@@ -82,6 +83,15 @@ export default function MemberCard({ member, isExpanded, onToggle }) {
               Term: {termDisplay(member)}
             </span>
           </div>
+          <button
+            onClick={(e) => { e.stopPropagation(); downloadVCard(member); }}
+            className="mt-3 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg
+                       text-xs font-medium text-teal bg-teal/10
+                       hover:bg-teal/20 transition-colors cursor-pointer"
+          >
+            <Download className="w-3.5 h-3.5" />
+            Save Contact
+          </button>
         </div>
       )}
     </div>
