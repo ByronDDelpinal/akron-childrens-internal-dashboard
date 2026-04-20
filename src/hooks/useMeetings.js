@@ -1,12 +1,9 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '../lib/supabase';
 import { createUpdate } from './useUpdates';
-import localMeetings from '../data/meetings';
 
 /**
  * Fetches meetings from Supabase.
- * Falls back to local data if Supabase is unavailable.
- *
  * Maps snake_case DB columns → camelCase JS properties.
  */
 
@@ -27,8 +24,7 @@ function mapRow(row) {
 }
 
 export function useMeetings() {
-  const [meetings, setMeetings] = useState(localMeetings);
-  const [source, setSource] = useState('local');
+  const [meetings, setMeetings] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [refreshKey, setRefreshKey] = useState(0);
@@ -40,7 +36,7 @@ export function useMeetings() {
 
     async function fetchMeetings() {
       if (!supabase) {
-        setSource('local');
+        setError('Database connection unavailable.');
         setIsLoading(false);
         return;
       }
@@ -53,12 +49,11 @@ export function useMeetings() {
 
         if (fetchError) throw fetchError;
 
-        if (!cancelled && data?.length > 0) {
+        if (!cancelled && data) {
           setMeetings(data.map(mapRow));
-          setSource('supabase');
         }
       } catch (err) {
-        console.warn('Supabase meetings fetch failed, using local data:', err.message);
+        console.error('Failed to fetch meetings:', err.message);
         setError(err.message);
       } finally {
         if (!cancelled) setIsLoading(false);
@@ -69,7 +64,7 @@ export function useMeetings() {
     return () => { cancelled = true; };
   }, [refreshKey]);
 
-  return { meetings, source, isLoading, error, refetch };
+  return { meetings, isLoading, error, refetch };
 }
 
 /**

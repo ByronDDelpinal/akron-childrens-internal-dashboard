@@ -8,8 +8,6 @@ import {
   Vote,
   CheckCircle2,
   XCircle,
-  Database,
-  HardDrive,
   ChevronDown,
   Filter,
 } from 'lucide-react';
@@ -130,7 +128,7 @@ function ProposalCard({ proposal, onRequestStatusChange, isUpdating }) {
 }
 
 export default function Proposals() {
-  const { proposals, source, isLoading, refetch } = useProposals();
+  const { proposals, isLoading, refetch } = useProposals();
   const { updateStatus, isUpdating } = useUpdateProposalStatus();
   const [showSubmitForm, setShowSubmitForm] = useState(false);
   const [statusFilter, setStatusFilter] = useState('all');
@@ -165,12 +163,6 @@ export default function Proposals() {
           <p className="text-sm text-med-gray mt-0.5">
             {isLoading ? 'Loading...' : `${activeCount} active proposal${activeCount !== 1 ? 's' : ''}`}
           </p>
-        </div>
-        <div className="flex items-center gap-1.5 text-[10px] text-med-gray">
-          {source === 'supabase'
-            ? <><Database className="w-3 h-3" /> Live from database</>
-            : <><HardDrive className="w-3 h-3" /> Local data</>
-          }
         </div>
       </div>
 

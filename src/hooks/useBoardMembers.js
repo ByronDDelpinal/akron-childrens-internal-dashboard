@@ -1,13 +1,9 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
-import localBoardMembers from '../data/boardMembers';
 
 /**
  * Fetches board members from Supabase.
- * Falls back to local JSON if Supabase is unavailable or the table doesn't exist yet.
- *
- * Maps snake_case DB columns → camelCase JS properties so the rest of the app
- * doesn't need to know where the data came from.
+ * Maps snake_case DB columns → camelCase JS properties.
  */
 
 function mapRow(row) {
@@ -32,8 +28,7 @@ function mapRow(row) {
 }
 
 export function useBoardMembers() {
-  const [members, setMembers] = useState(localBoardMembers);
-  const [source, setSource] = useState('local');
+  const [members, setMembers] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -42,7 +37,7 @@ export function useBoardMembers() {
 
     async function fetchMembers() {
       if (!supabase) {
-        setSource('local');
+        setError('Database connection unavailable.');
         setIsLoading(false);
         return;
       }
@@ -55,14 +50,12 @@ export function useBoardMembers() {
 
         if (fetchError) throw fetchError;
 
-        if (!cancelled && data?.length > 0) {
+        if (!cancelled && data) {
           setMembers(data.map(mapRow));
-          setSource('supabase');
         }
       } catch (err) {
-        console.warn('Supabase fetch failed, using local data:', err.message);
+        console.error('Failed to fetch board members:', err.message);
         setError(err.message);
-        // Keep local data as fallback — no state change needed
       } finally {
         if (!cancelled) setIsLoading(false);
       }
@@ -72,5 +65,5 @@ export function useBoardMembers() {
     return () => { cancelled = true; };
   }, []);
 
-  return { members, source, isLoading, error };
+  return { members, isLoading, error };
 }

@@ -6,8 +6,6 @@ import {
   ExternalLink,
   Download,
   FolderOpen,
-  Database,
-  HardDrive,
   Plus,
   Trash2,
 } from 'lucide-react';
@@ -75,7 +73,7 @@ function DocumentCard({ doc, onRequestDelete, isDeleting }) {
 }
 
 export default function Documents() {
-  const { documents, source, isLoading, refetch } = useDocuments();
+  const { documents, isLoading, refetch } = useDocuments();
   const { deleteDocument, isDeleting } = useDeleteDocument();
   const [search, setSearch] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('all');
@@ -118,12 +116,6 @@ export default function Documents() {
           <p className="text-sm text-med-gray mt-0.5">
             {isLoading ? 'Loading...' : `${documents.length} documents`}
           </p>
-        </div>
-        <div className="flex items-center gap-1.5 text-[10px] text-med-gray">
-          {source === 'supabase'
-            ? <><Database className="w-3 h-3" /> Live from database</>
-            : <><HardDrive className="w-3 h-3" /> Local data</>
-          }
         </div>
       </div>
 

@@ -27,7 +27,6 @@ function mapRow(row) {
  */
 export function useProposals() {
   const [proposals, setProposals] = useState([]);
-  const [source, setSource] = useState('local');
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [refreshKey, setRefreshKey] = useState(0);
@@ -39,7 +38,7 @@ export function useProposals() {
 
     async function fetchProposals() {
       if (!supabase) {
-        setSource('local');
+        setError('Database connection unavailable.');
         setIsLoading(false);
         return;
       }
@@ -54,10 +53,9 @@ export function useProposals() {
 
         if (!cancelled && data) {
           setProposals(data.map(mapRow));
-          setSource('supabase');
         }
       } catch (err) {
-        console.warn('Supabase proposals fetch failed:', err.message);
+        console.error('Failed to fetch proposals:', err.message);
         setError(err.message);
       } finally {
         if (!cancelled) setIsLoading(false);
@@ -68,7 +66,7 @@ export function useProposals() {
     return () => { cancelled = true; };
   }, [refreshKey]);
 
-  return { proposals, source, isLoading, error, refetch };
+  return { proposals, isLoading, error, refetch };
 }
 
 /**

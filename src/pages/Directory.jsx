@@ -1,12 +1,12 @@
 import { useState, useMemo } from 'react';
-import { Search, Users, Filter, Database, HardDrive } from 'lucide-react';
+import { Search, Users, Filter } from 'lucide-react';
 import MemberCard from '../components/directory/MemberCard';
 import { sortedMembers, allCommittees, displayName } from '../data/boardMembers';
 import { useBoardMembers } from '../hooks/useBoardMembers';
 import Badge from '../components/ui/Badge';
 
 export default function Directory() {
-  const { members, source, isLoading } = useBoardMembers();
+  const { members, isLoading } = useBoardMembers();
   const [search, setSearch] = useState('');
   const [committeeFilter, setCommitteeFilter] = useState('all');
   const [expandedId, setExpandedId] = useState(null);
@@ -47,12 +47,6 @@ export default function Directory() {
           <p className="text-sm text-med-gray mt-0.5">
             {isLoading ? 'Loading...' : `${activeCount} active members · ${officerCount} officers`}
           </p>
-        </div>
-        <div className="flex items-center gap-1.5 text-[10px] text-med-gray">
-          {source === 'supabase'
-            ? <><Database className="w-3 h-3" /> Live from database</>
-            : <><HardDrive className="w-3 h-3" /> Local data</>
-          }
         </div>
       </div>
 

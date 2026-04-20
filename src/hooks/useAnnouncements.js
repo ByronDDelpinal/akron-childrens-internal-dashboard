@@ -3,8 +3,6 @@ import { supabase } from '../lib/supabase';
 
 /**
  * Fetches announcements from Supabase.
- * Falls back to local mock data if Supabase is unavailable.
- *
  * Only returns non-archived announcements that haven't expired.
  */
 
@@ -23,7 +21,6 @@ function mapRow(row) {
 
 export function useAnnouncements() {
   const [announcements, setAnnouncements] = useState([]);
-  const [source, setSource] = useState('local');
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [refreshKey, setRefreshKey] = useState(0);
@@ -35,7 +32,7 @@ export function useAnnouncements() {
 
     async function fetchAnnouncements() {
       if (!supabase) {
-        setSource('local');
+        setError('Database connection unavailable.');
         setIsLoading(false);
         return;
       }
@@ -55,10 +52,9 @@ export function useAnnouncements() {
 
         if (!cancelled && data) {
           setAnnouncements(data.map(mapRow));
-          setSource('supabase');
         }
       } catch (err) {
-        console.warn('Supabase announcements fetch failed, using local data:', err.message);
+        console.error('Failed to fetch announcements:', err.message);
         setError(err.message);
       } finally {
         if (!cancelled) setIsLoading(false);
@@ -69,7 +65,7 @@ export function useAnnouncements() {
     return () => { cancelled = true; };
   }, [refreshKey]);
 
-  return { announcements, source, isLoading, error, refetch };
+  return { announcements, isLoading, error, refetch };
 }
 
 /**

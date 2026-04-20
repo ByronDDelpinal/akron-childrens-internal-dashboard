@@ -88,7 +88,6 @@ export function useMeetingDocuments(meetingSlug) {
  */
 export function useDocuments(category = null) {
   const [documents, setDocuments] = useState([]);
-  const [source, setSource] = useState('local');
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [refreshKey, setRefreshKey] = useState(0);
@@ -100,7 +99,7 @@ export function useDocuments(category = null) {
 
     async function fetchDocuments() {
       if (!supabase) {
-        setSource('local');
+        setError('Database connection unavailable.');
         setIsLoading(false);
         return;
       }
@@ -120,7 +119,6 @@ export function useDocuments(category = null) {
 
         if (!cancelled && data) {
           setDocuments(data.map(mapDoc));
-          setSource('supabase');
         }
       } catch (err) {
         console.warn('Failed to fetch documents:', err.message);
@@ -134,5 +132,5 @@ export function useDocuments(category = null) {
     return () => { cancelled = true; };
   }, [category, refreshKey]);
 
-  return { documents, source, isLoading, error, refetch };
+  return { documents, isLoading, error, refetch };
 }

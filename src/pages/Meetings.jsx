@@ -6,8 +6,6 @@ import {
   MapPin,
   Filter,
   Plus,
-  Database,
-  HardDrive,
   ChevronRight,
   ChevronDown,
 } from 'lucide-react';
@@ -79,7 +77,7 @@ function MeetingRow({ meeting }) {
 }
 
 export default function Meetings() {
-  const { meetings, source, isLoading, refetch } = useMeetings();
+  const { meetings, isLoading, refetch } = useMeetings();
   const [typeFilter, setTypeFilter] = useState('all');
   const [showAddForm, setShowAddForm] = useState(false);
   const [pastVisible, setPastVisible] = useState(PAST_PAGE_SIZE);
@@ -114,12 +112,6 @@ export default function Meetings() {
           <p className="text-sm text-med-gray mt-0.5">
             {isLoading ? 'Loading...' : `${upcoming.length} upcoming · ${past.length} past`}
           </p>
-        </div>
-        <div className="flex items-center gap-1.5 text-[10px] text-med-gray">
-          {source === 'supabase'
-            ? <><Database className="w-3 h-3" /> Live from database</>
-            : <><HardDrive className="w-3 h-3" /> Local data</>
-          }
         </div>
       </div>
 
