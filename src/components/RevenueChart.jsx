@@ -11,7 +11,7 @@ import {
 import Card from './ui/Card';
 import ChartTooltip from './ui/ChartTooltip';
 import { formatDollarCompact } from '../lib/formatters';
-import { colors, neutrals, chartTheme } from '../lib/tokens';
+import { chartTheme } from '../lib/tokens';
 
 /**
  * Bar chart comparing revenue and expenses over time.

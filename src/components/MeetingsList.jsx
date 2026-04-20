@@ -4,6 +4,7 @@ import Card, { CardHeader } from './ui/Card';
 import ScrollFade from './ui/ScrollFade';
 import IconBox from './ui/IconBox';
 import { formatDateMedium, daysUntil } from '../lib/formatters';
+import { getMeetingAccent } from '../lib/constants';
 
 /**
  * List of upcoming meetings.
@@ -23,7 +24,7 @@ export default function MeetingsList({ meetings }) {
           >
             <IconBox
               icon={Calendar}
-              accent={meeting.meetingType === 'full_board' ? 'purple' : 'teal'}
+              accent={getMeetingAccent(meeting.meetingType)}
             />
             <div className="min-w-0 flex-1">
               <div className="flex items-start justify-between gap-2">

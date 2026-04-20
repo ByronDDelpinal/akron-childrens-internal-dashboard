@@ -1,13 +1,7 @@
 import { useState } from 'react';
 import { X, Calendar, Plus, Loader2 } from 'lucide-react';
 import { useAddMeeting } from '../../hooks/useMeetings';
-
-const typeOptions = [
-  ['full_board', 'Full Board'],
-  ['committee', 'Committee'],
-  ['special', 'Special'],
-  ['social', 'Social'],
-];
+import { meetingTypeOptions } from '../../lib/constants';
 
 /**
  * Slide-over form for scheduling a new meeting.
@@ -89,7 +83,7 @@ export default function AddMeetingForm({ onClose, onSuccess }) {
           <div>
             <label className="block text-xs font-medium text-dark mb-1.5">Meeting Type</label>
             <div className="grid grid-cols-2 gap-2">
-              {typeOptions.map(([value, label]) => (
+              {meetingTypeOptions.map(([value, label]) => (
                 <button
                   key={value}
                   type="button"

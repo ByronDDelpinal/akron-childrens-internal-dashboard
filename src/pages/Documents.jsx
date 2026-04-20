@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo } from 'react';
 import {
   Search,
   Filter,
@@ -17,21 +17,7 @@ import ConfirmModal from '../components/ui/ConfirmModal';
 import { useDocuments } from '../hooks/useMeetingDocuments';
 import { useDeleteDocument } from '../hooks/useDeleteDocument';
 import { formatDateShort } from '../lib/formatters';
-
-const categoryLabels = {
-  board_packet: 'Board Packet',
-  agenda: 'Agenda',
-  minutes: 'Minutes',
-  financial_report: 'Financial Report',
-  governance: 'Governance',
-  policy: 'Policy',
-  strategic_plan: 'Strategic Plan',
-  bylaw: 'Bylaw',
-  presentation: 'Presentation',
-  other: 'Other',
-};
-
-const categoryOptions = Object.entries(categoryLabels);
+import { categoryLabels, categoryOptions } from '../lib/constants';
 
 function DocumentCard({ doc, onRequestDelete, isDeleting }) {
   const isExternal = doc.storageType === 'external';

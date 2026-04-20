@@ -15,7 +15,8 @@ import Badge from '../components/ui/Badge';
 import AddMeetingForm from '../components/meetings/AddMeetingForm';
 import { useMeetings } from '../hooks/useMeetings';
 import { upcomingMeetings, pastMeetings, timeDisplay, typeLabel } from '../data/meetings';
-import { formatDateMedium, formatDateShort, daysUntil } from '../lib/formatters';
+import { formatDateMedium, daysUntil } from '../lib/formatters';
+import { getMeetingAccent } from '../lib/constants';
 
 const typeFilters = [
   ['all', 'All'],
@@ -36,7 +37,7 @@ function MeetingRow({ meeting }) {
     >
       <IconBox
         icon={Calendar}
-        accent={meeting.meetingType === 'full_board' ? 'purple' : 'teal'}
+        accent={getMeetingAccent(meeting.meetingType)}
         size="sm"
       />
       <div className="min-w-0 flex-1">

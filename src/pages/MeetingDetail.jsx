@@ -1,5 +1,5 @@
 import { useParams, Link } from 'react-router-dom';
-import { useMemo, useState, useCallback } from 'react';
+import { useMemo, useState } from 'react';
 import {
   Calendar,
   Clock,
@@ -21,20 +21,8 @@ import { useMeetings } from '../hooks/useMeetings';
 import { useMeetingDocuments } from '../hooks/useMeetingDocuments';
 import { useDeleteDocument } from '../hooks/useDeleteDocument';
 import { formatDateMedium } from '../lib/formatters';
+import { categoryLabels, getMeetingAccent } from '../lib/constants';
 import { timeDisplay, typeLabel } from '../data/meetings';
-
-const categoryLabels = {
-  board_packet: 'Board Packet',
-  agenda: 'Agenda',
-  minutes: 'Minutes',
-  financial_report: 'Financial Report',
-  governance: 'Governance',
-  policy: 'Policy',
-  strategic_plan: 'Strategic Plan',
-  bylaw: 'Bylaw',
-  presentation: 'Presentation',
-  other: 'Other',
-};
 
 function DocumentRow({ doc, onRequestDelete, isDeleting }) {
   const isExternal = doc.storageType === 'external';
@@ -133,7 +121,7 @@ export default function MeetingDetail() {
       <div className="flex flex-col sm:flex-row sm:items-start gap-3">
         <IconBox
           icon={Calendar}
-          accent={meeting.meetingType === 'full_board' ? 'purple' : 'teal'}
+          accent={getMeetingAccent(meeting.meetingType)}
         />
         <div className="flex-1">
           <div className="flex items-center gap-2 flex-wrap">

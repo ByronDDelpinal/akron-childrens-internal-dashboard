@@ -4,19 +4,7 @@ import { useAddDocument } from '../../hooks/useAddDocument';
 import { useMeetings } from '../../hooks/useMeetings';
 import { upcomingMeetings, pastMeetings, typeLabel } from '../../data/meetings';
 import { formatDateShort } from '../../lib/formatters';
-
-const categoryOptions = [
-  ['board_packet', 'Board Packet'],
-  ['agenda', 'Agenda'],
-  ['minutes', 'Minutes'],
-  ['financial_report', 'Financial Report'],
-  ['governance', 'Governance'],
-  ['policy', 'Policy'],
-  ['strategic_plan', 'Strategic Plan'],
-  ['bylaw', 'Bylaw'],
-  ['presentation', 'Presentation'],
-  ['other', 'Other'],
-];
+import { categoryOptions } from '../../lib/constants';
 
 /**
  * Slide-over form for adding an external document link.
@@ -168,7 +156,7 @@ export default function AddDocumentForm({ onClose, onSuccess, preselectedMeeting
               Link to Meetings
             </label>
             <div className="relative mb-2">
-              <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-med-gray" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-med-gray" />
               <input
                 type="text"
                 value={meetingSearch}

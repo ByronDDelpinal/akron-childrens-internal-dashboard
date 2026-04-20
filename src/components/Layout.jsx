@@ -1,5 +1,6 @@
 import { Outlet } from 'react-router-dom';
 import { useState } from 'react';
+import ErrorBoundary from './ui/ErrorBoundary';
 import {
   LayoutDashboard,
   FolderOpen,
@@ -110,7 +111,9 @@ export default function Layout({ onLogout }) {
 
         {/* Main content */}
         <main className="flex-1 overflow-y-auto">
-          <Outlet />
+          <ErrorBoundary>
+            <Outlet />
+          </ErrorBoundary>
         </main>
       </div>
     </div>

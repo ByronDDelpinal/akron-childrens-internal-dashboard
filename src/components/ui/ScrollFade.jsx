@@ -38,7 +38,7 @@ export default function ScrollFade({ children, maxHeight = 320, className = '' }
         <div
           className="absolute bottom-0 left-0 right-0 h-10 pointer-events-none rounded-b-xl"
           style={{
-            background: 'linear-gradient(to bottom, transparent, white)',
+            background: 'linear-gradient(to bottom, transparent, var(--color-white, #ffffff))',
           }}
         />
       )}

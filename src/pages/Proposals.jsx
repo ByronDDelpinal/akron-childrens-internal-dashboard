@@ -20,14 +20,10 @@ import ConfirmModal from '../components/ui/ConfirmModal';
 import SubmitProposalForm from '../components/proposals/SubmitProposalForm';
 import { useProposals, useUpdateProposalStatus } from '../hooks/useProposals';
 import { formatDateShort } from '../lib/formatters';
+import { proposalStatusConfig, proposalStatusOptions } from '../lib/constants';
 
-const statusConfig = {
-  submitted: { label: 'Submitted', variant: 'info' },
-  approved:  { label: 'Approved',  variant: 'success' },
-  denied:    { label: 'Denied',    variant: 'important' },
-};
-
-const statusOptions = ['all', 'submitted', 'approved', 'denied'];
+const statusConfig = proposalStatusConfig;
+const filterOptions = ['all', ...proposalStatusOptions];
 
 function ProposalCard({ proposal, onRequestStatusChange, isUpdating }) {
   const [showActions, setShowActions] = useState(false);
@@ -222,11 +218,11 @@ export default function Proposals() {
             onChange={(e) => setStatusFilter(e.target.value)}
             className="pl-9 pr-8 py-2.5 rounded-lg border border-border bg-white
                        text-sm text-dark appearance-none cursor-pointer
-                       focus:outline-none focus:ring-2 focus:ring-purple focus:border-transparent
+                       focus:outline-none focus:ring-2 focus:ring-teal focus:border-transparent
                        transition-all"
           >
             <option value="all">All Proposals</option>
-            {statusOptions.slice(1).map(s => (
+            {proposalStatusOptions.map(s => (
               <option key={s} value={s}>{statusConfig[s].label}</option>
             ))}
           </select>
