@@ -9,10 +9,12 @@ import {
   Database,
   HardDrive,
   Plus,
+  Trash2,
 } from 'lucide-react';
 import IconBox from '../components/ui/IconBox';
 import AddDocumentForm from '../components/documents/AddDocumentForm';
 import { useDocuments } from '../hooks/useMeetingDocuments';
+import { useDeleteDocument } from '../hooks/useDeleteDocument';
 import { formatDateShort } from '../lib/formatters';
 
 const categoryLabels = {
@@ -30,54 +32,80 @@ const categoryLabels = {
 
 const categoryOptions = Object.entries(categoryLabels);
 
-function DocumentCard({ doc }) {
+function DocumentCard({ doc, onDelete, isDeleting }) {
   const isExternal = doc.storageType === 'external';
   const href = isExternal ? doc.externalUrl : doc.storagePath;
 
+  function handleDelete(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    if (window.confirm(`Delete "${doc.title}"? This cannot be undone.`)) {
+      onDelete(doc);
+    }
+  }
+
   return (
-    <a
-      href={href}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="flex items-center gap-3 p-4 bg-white rounded-xl border border-border
-                 hover:shadow-sm hover:border-teal/30 transition-all group"
-    >
-      <IconBox icon={FileText} accent="teal" size="sm" />
-      <div className="min-w-0 flex-1">
-        <p className="text-sm font-medium text-dark group-hover:text-teal transition-colors truncate">
-          {doc.title}
-        </p>
-        <div className="flex items-center gap-2 mt-1">
-          <span className="text-[10px] text-med-gray bg-light-gray px-1.5 py-0.5 rounded">
-            {categoryLabels[doc.category] || doc.category}
-          </span>
-          {doc.fileName && (
-            <span className="text-[10px] text-med-gray truncate">{doc.fileName}</span>
-          )}
-          {doc.createdAt && (
-            <span className="text-[10px] text-med-gray">
-              {formatDateShort(doc.createdAt.slice(0, 10))}
+    <div className="flex items-center gap-3 p-4 bg-white rounded-xl border border-border
+                    hover:shadow-sm hover:border-teal/30 transition-all group">
+      <a
+        href={href}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="flex items-center gap-3 min-w-0 flex-1 hover:opacity-80 transition-opacity"
+      >
+        <IconBox icon={FileText} accent="teal" size="sm" />
+        <div className="min-w-0 flex-1">
+          <p className="text-sm font-medium text-dark group-hover:text-teal transition-colors truncate">
+            {doc.title}
+          </p>
+          <div className="flex items-center gap-2 mt-1">
+            <span className="text-[10px] text-med-gray bg-light-gray px-1.5 py-0.5 rounded">
+              {categoryLabels[doc.category] || doc.category}
             </span>
+            {doc.fileName && (
+              <span className="text-[10px] text-med-gray truncate">{doc.fileName}</span>
+            )}
+            {doc.createdAt && (
+              <span className="text-[10px] text-med-gray">
+                {formatDateShort(doc.createdAt.slice(0, 10))}
+              </span>
+            )}
+          </div>
+          {doc.description && (
+            <p className="text-xs text-med-gray mt-1 truncate">{doc.description}</p>
           )}
         </div>
-        {doc.description && (
-          <p className="text-xs text-med-gray mt-1 truncate">{doc.description}</p>
+        {isExternal ? (
+          <ExternalLink className="w-4 h-4 text-med-gray shrink-0" />
+        ) : (
+          <Download className="w-4 h-4 text-med-gray shrink-0" />
         )}
-      </div>
-      {isExternal ? (
-        <ExternalLink className="w-4 h-4 text-med-gray shrink-0 group-hover:text-teal transition-colors" />
-      ) : (
-        <Download className="w-4 h-4 text-med-gray shrink-0 group-hover:text-teal transition-colors" />
-      )}
-    </a>
+      </a>
+      <button
+        onClick={handleDelete}
+        disabled={isDeleting}
+        className="p-1.5 rounded-lg text-med-gray hover:text-orange hover:bg-orange/10
+                   transition-colors opacity-0 group-hover:opacity-100 shrink-0
+                   disabled:opacity-50"
+        title="Delete document"
+      >
+        <Trash2 className="w-3.5 h-3.5" />
+      </button>
+    </div>
   );
 }
 
 export default function Documents() {
   const { documents, source, isLoading, refetch } = useDocuments();
+  const { deleteDocument, isDeleting } = useDeleteDocument();
   const [search, setSearch] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [showAddForm, setShowAddForm] = useState(false);
+
+  async function handleDelete(doc) {
+    const success = await deleteDocument(doc);
+    if (success) refetch();
+  }
 
   const filtered = useMemo(() => {
     let list = [...documents];
@@ -165,7 +193,7 @@ export default function Documents() {
       <div className="space-y-2">
         {filtered.length > 0 ? (
           filtered.map(doc => (
-            <DocumentCard key={doc.id} doc={doc} />
+            <DocumentCard key={doc.id} doc={doc} onDelete={handleDelete} isDeleting={isDeleting} />
           ))
         ) : (
           <div className="text-center py-12">

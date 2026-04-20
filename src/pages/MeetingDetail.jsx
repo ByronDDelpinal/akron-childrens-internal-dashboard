@@ -10,6 +10,7 @@ import {
   Download,
   FolderOpen,
   Plus,
+  Trash2,
 } from 'lucide-react';
 import Card, { CardHeader } from '../components/ui/Card';
 import Badge from '../components/ui/Badge';
@@ -17,6 +18,7 @@ import IconBox from '../components/ui/IconBox';
 import AddDocumentForm from '../components/documents/AddDocumentForm';
 import { useMeetings } from '../hooks/useMeetings';
 import { useMeetingDocuments } from '../hooks/useMeetingDocuments';
+import { useDeleteDocument } from '../hooks/useDeleteDocument';
 import { formatDateMedium } from '../lib/formatters';
 import { timeDisplay, typeLabel } from '../data/meetings';
 
@@ -33,38 +35,57 @@ const categoryLabels = {
   other: 'Other',
 };
 
-function DocumentRow({ doc }) {
+function DocumentRow({ doc, onDelete, isDeleting }) {
   const isExternal = doc.storageType === 'external';
   const href = isExternal ? doc.externalUrl : doc.storagePath;
 
+  function handleDelete(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    if (window.confirm(`Delete "${doc.title}"? This cannot be undone.`)) {
+      onDelete(doc);
+    }
+  }
+
   return (
-    <a
-      href={href}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="flex items-center gap-3 p-3 rounded-lg bg-light-gray/60 border border-border/50
-                 hover:border-teal/30 hover:bg-teal-light/20 transition-all group"
-    >
-      <IconBox icon={FileText} accent="teal" size="sm" />
-      <div className="min-w-0 flex-1">
-        <p className="text-sm font-medium text-dark group-hover:text-teal transition-colors truncate">
-          {doc.title}
-        </p>
-        <div className="flex items-center gap-2 mt-0.5">
-          <span className="text-[10px] text-med-gray bg-white px-1.5 py-0.5 rounded">
-            {categoryLabels[doc.category] || doc.category}
-          </span>
-          {doc.fileName && (
-            <span className="text-[10px] text-med-gray truncate">{doc.fileName}</span>
-          )}
+    <div className="flex items-center gap-3 p-3 rounded-lg bg-light-gray/60 border border-border/50 group">
+      <a
+        href={href}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="flex items-center gap-3 min-w-0 flex-1 hover:opacity-80 transition-opacity"
+      >
+        <IconBox icon={FileText} accent="teal" size="sm" />
+        <div className="min-w-0 flex-1">
+          <p className="text-sm font-medium text-dark group-hover:text-teal transition-colors truncate">
+            {doc.title}
+          </p>
+          <div className="flex items-center gap-2 mt-0.5">
+            <span className="text-[10px] text-med-gray bg-white px-1.5 py-0.5 rounded">
+              {categoryLabels[doc.category] || doc.category}
+            </span>
+            {doc.fileName && (
+              <span className="text-[10px] text-med-gray truncate">{doc.fileName}</span>
+            )}
+          </div>
         </div>
-      </div>
-      {isExternal ? (
-        <ExternalLink className="w-4 h-4 text-med-gray shrink-0 group-hover:text-teal transition-colors" />
-      ) : (
-        <Download className="w-4 h-4 text-med-gray shrink-0 group-hover:text-teal transition-colors" />
-      )}
-    </a>
+        {isExternal ? (
+          <ExternalLink className="w-4 h-4 text-med-gray shrink-0" />
+        ) : (
+          <Download className="w-4 h-4 text-med-gray shrink-0" />
+        )}
+      </a>
+      <button
+        onClick={handleDelete}
+        disabled={isDeleting}
+        className="p-1.5 rounded-lg text-med-gray hover:text-orange hover:bg-orange/10
+                   transition-colors opacity-0 group-hover:opacity-100 shrink-0
+                   disabled:opacity-50"
+        title="Delete document"
+      >
+        <Trash2 className="w-3.5 h-3.5" />
+      </button>
+    </div>
   );
 }
 
@@ -72,7 +93,13 @@ export default function MeetingDetail() {
   const { slug } = useParams();
   const { meetings } = useMeetings();
   const { documents, isLoading: docsLoading, refetch } = useMeetingDocuments(slug);
+  const { deleteDocument, isDeleting } = useDeleteDocument();
   const [showAddForm, setShowAddForm] = useState(false);
+
+  async function handleDelete(doc) {
+    const success = await deleteDocument(doc);
+    if (success) refetch();
+  }
 
   const meeting = useMemo(
     () => meetings.find(m => m.id === slug),
@@ -154,7 +181,7 @@ export default function MeetingDetail() {
         ) : documents.length > 0 ? (
           <div className="space-y-2">
             {documents.map(doc => (
-              <DocumentRow key={doc.id} doc={doc} />
+              <DocumentRow key={doc.id} doc={doc} onDelete={handleDelete} isDeleting={isDeleting} />
             ))}
           </div>
         ) : (
