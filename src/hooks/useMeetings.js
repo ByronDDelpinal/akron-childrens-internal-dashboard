@@ -20,6 +20,9 @@ function mapRow(row) {
     description: row.description,
     committee: row.committee,
     isCancelled: row.is_cancelled,
+    driveFolderUrl: row.drive_folder_url,
+    driveParentFolderUrl: row.drive_parent_folder_url,
+    driveRootFolderUrl: row.drive_root_folder_url,
   };
 }
 
@@ -69,16 +72,17 @@ export function useMeetings() {
 
 /**
  * Generates a URL-friendly slug from meeting type, date, and optional committee.
- * e.g., "full-board-2026-04", "committee-finance-2026-05"
+ * Includes the full date + a short random suffix to avoid collisions.
+ * e.g., "full-board-2026-04-20-a3f", "committee-finance-2026-05-15-b7c"
  */
 function generateSlug(meetingType, meetingDate, committee) {
-  const datePart = meetingDate.slice(0, 7).replace('-', '-'); // "2026-04"
+  const suffix = Math.random().toString(36).slice(2, 5); // 3-char random
   if (meetingType === 'committee' && committee) {
     const committeePart = committee.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
-    return `committee-${committeePart}-${datePart}`;
+    return `committee-${committeePart}-${meetingDate}-${suffix}`;
   }
   const typePart = meetingType.replace(/_/g, '-');
-  return `${typePart}-${datePart}`;
+  return `${typePart}-${meetingDate}-${suffix}`;
 }
 
 /**

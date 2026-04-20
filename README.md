@@ -100,7 +100,46 @@ supabase secrets set BOARD_PASSWORD_HASH='your-hash-here'
 
 You'll also need to deploy the `validate-password` Edge Function. See the Supabase docs on [Edge Functions](https://supabase.com/docs/guides/functions) for deployment steps.
 
-### 5. Run it
+### 5. Set up Google integration (optional but recommended)
+
+The portal can automatically create Google Drive documents and send Google Calendar invites when you schedule a meeting. This is optional — the portal works without it, but it's what makes the "push a button and everything happens" experience.
+
+**a) Create a Google Cloud project**
+
+Go to [console.cloud.google.com](https://console.cloud.google.com), create a new project (or use an existing one), and enable the **Google Drive API** and **Google Calendar API** from the API Library.
+
+**b) Create OAuth2 credentials**
+
+In the Google Cloud Console, go to APIs & Services → Credentials → Create Credentials → OAuth client ID. Choose "Desktop app" as the application type. Download or copy the Client ID and Client Secret.
+
+**c) Create your template documents**
+
+Create two Google Docs that will serve as your agenda and minutes templates. Format them however you'd like — they'll be copied and renamed for each new meeting. Note the document ID from each URL (the long string in `docs.google.com/document/d/{THIS_PART}/edit`).
+
+**d) Create a board documents folder**
+
+Create a folder in Google Drive where all meeting documents will live. Note the folder ID from the URL (`drive.google.com/drive/folders/{THIS_PART}`).
+
+**e) Run the auth script**
+
+```bash
+node scripts/google-auth.mjs
+```
+
+This opens your browser for Google authorization, then outputs the `supabase secrets set` commands you need to run. It will prompt you for your Client ID and Client Secret.
+
+**f) Deploy the Edge Functions**
+
+```bash
+supabase functions deploy google-drive
+supabase functions deploy google-calendar
+```
+
+That's it. When you schedule a meeting with the "Create agenda & minutes in Google Drive" and "Send calendar invites" checkboxes enabled, the portal handles everything automatically.
+
+**Switching Google accounts later:** When you get access to the organization's Google Workspace, just run the auth script again with the new credentials, update the Supabase secrets, and point the folder/template IDs to the org's Drive. Zero code changes needed.
+
+### 6. Run it
 
 ```bash
 npm run dev
@@ -115,17 +154,23 @@ src/
   pages/          # One file per route (Dashboard, Meetings, Directory, etc.)
   components/     # Reusable UI organized by feature
     ui/           # Generic primitives (Card, Badge, SlideOver, etc.)
-    meetings/     # Meeting-specific forms
+    meetings/     # Meeting-specific forms (Add, Edit)
     documents/    # Document-specific forms
     proposals/    # Proposal-specific forms
     directory/    # Board member card and avatar
-  hooks/          # Data fetching and mutations (one hook per Supabase table)
+  hooks/          # Data fetching, mutations, and Google integration
   data/           # Helper functions for sorting, filtering, formatting
   lib/            # Supabase client, design tokens, formatters, constants
 supabase/
+  functions/
+    _shared/      # Shared Google OAuth helpers
+    validate-password/  # Password gate Edge Function
+    google-drive/       # Creates docs from templates in Google Drive
+    google-calendar/    # Creates calendar events with attendee invites
   migrations/     # SQL schema + seed data (run these to set up your DB)
 scripts/
-  generate-hash.mjs  # CLI tool for generating the portal password hash
+  generate-hash.mjs   # CLI tool for generating the portal password hash
+  google-auth.mjs     # CLI tool for Google OAuth2 authorization
 ```
 
 The architecture is intentionally flat. Pages fetch data via hooks, render components, and manage local UI state. There's no global state management — each hook talks directly to Supabase.

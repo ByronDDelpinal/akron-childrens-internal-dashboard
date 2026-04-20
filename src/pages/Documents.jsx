@@ -191,9 +191,9 @@ export default function Documents() {
       {/* Delete confirmation modal */}
       {docToDelete && (
         <ConfirmModal
-          title={`Delete "${docToDelete.title}"?`}
-          message="Are you sure you want to delete this? It will be unavailable for everyone, and an announcement will be made."
-          confirmLabel="Delete Document"
+          title={`Remove "${docToDelete.title}"?`}
+          message="This only removes the document from the portal — the original file in Google Drive (or wherever it's hosted) will not be deleted. An announcement will be posted to let the board know."
+          confirmLabel="Remove from Portal"
           onConfirm={confirmDelete}
           onCancel={() => setDocToDelete(null)}
           isLoading={isDeleting}

@@ -10,6 +10,7 @@ import {
   ExternalLink,
   Download,
   FolderOpen,
+  FolderRoot,
   Plus,
   Pencil,
   Trash2,
@@ -166,6 +167,33 @@ export default function MeetingDetail() {
                 Add to Google Calendar
               </a>
             )}
+            {meeting.driveRootFolderUrl && (
+              <a
+                href={meeting.driveRootFolderUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium
+                           text-med-gray border border-border rounded-lg
+                           hover:text-teal hover:border-teal/30 hover:bg-teal-light/30 transition-colors"
+              >
+                <FolderRoot className="w-3.5 h-3.5" />
+                All Meeting Materials
+              </a>
+            )}
+            {meeting.driveParentFolderUrl && (
+              <a
+                href={meeting.driveParentFolderUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium
+                           text-med-gray border border-border rounded-lg
+                           hover:text-teal hover:border-teal/30 hover:bg-teal-light/30 transition-colors"
+              >
+                <FolderOpen className="w-3.5 h-3.5" />
+                {meeting.meetingType === 'full_board' ? 'Board Meetings' :
+                 meeting.committee ? `${meeting.committee} Committee` : 'Meeting Folder'}
+              </a>
+            )}
             <button
               onClick={() => setShowEditForm(true)}
               className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium
@@ -182,13 +210,26 @@ export default function MeetingDetail() {
       {/* Documents section */}
       <Card>
         <CardHeader title="Meeting Documents">
-          <button
-            onClick={() => setShowAddForm(true)}
-            className="flex items-center gap-1 text-xs font-medium text-teal hover:text-teal-dark transition-colors cursor-pointer"
-          >
-            <Plus className="w-3.5 h-3.5" />
-            Add
-          </button>
+          <div className="flex items-center gap-3">
+            {meeting.driveFolderUrl && (
+              <a
+                href={meeting.driveFolderUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-1 text-xs font-medium text-med-gray hover:text-teal transition-colors"
+              >
+                <FolderOpen className="w-3.5 h-3.5" />
+                Open in Drive
+              </a>
+            )}
+            <button
+              onClick={() => setShowAddForm(true)}
+              className="flex items-center gap-1 text-xs font-medium text-teal hover:text-teal-dark transition-colors cursor-pointer"
+            >
+              <Plus className="w-3.5 h-3.5" />
+              Add
+            </button>
+          </div>
         </CardHeader>
         {docsLoading ? (
           <p className="text-sm text-med-gray py-4 text-center">Loading documents...</p>
@@ -227,9 +268,9 @@ export default function MeetingDetail() {
       {/* Delete confirmation modal */}
       {docToDelete && (
         <ConfirmModal
-          title={`Delete "${docToDelete.title}"?`}
-          message="Are you sure you want to delete this? It will be unavailable for everyone, and an announcement will be made."
-          confirmLabel="Delete Document"
+          title={`Remove "${docToDelete.title}"?`}
+          message="This only removes the document from the portal — the original file in Google Drive (or wherever it's hosted) will not be deleted. An announcement will be posted to let the board know."
+          confirmLabel="Remove from Portal"
           onConfirm={confirmDelete}
           onCancel={() => setDocToDelete(null)}
           isLoading={isDeleting}
