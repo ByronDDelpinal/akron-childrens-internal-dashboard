@@ -14,6 +14,7 @@ import {
   LogOut,
 } from 'lucide-react';
 import NavItem from './ui/NavItem';
+import { ORG_NAME } from '../lib/constants';
 
 const navItems = [
   { to: '/', icon: LayoutDashboard, label: 'Dashboard' },
@@ -66,7 +67,7 @@ export default function Layout({ onLogout }) {
           <BrandMark />
           <div className="hidden sm:block">
             <h1 className="text-sm font-semibold text-dark leading-tight">Board Portal</h1>
-            <p className="text-xs text-med-gray leading-tight">Akron Children's Museum</p>
+            <p className="text-xs text-med-gray leading-tight">{ORG_NAME}</p>
           </div>
         </div>
 

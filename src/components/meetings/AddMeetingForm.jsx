@@ -5,7 +5,7 @@ import { useAddMeeting } from '../../hooks/useMeetings';
 import { useBoardMembers } from '../../hooks/useBoardMembers';
 import { useCreateMeetingDocs, useCreateCalendarEvent } from '../../hooks/useGoogleIntegration';
 import { supabase } from '../../lib/supabase';
-import { meetingTypeOptions } from '../../lib/constants';
+import { meetingTypeOptions, ORG_NAME } from '../../lib/constants';
 
 /**
  * Meeting type presets — auto-fill title, time, and location.
@@ -16,7 +16,7 @@ const PRESETS = {
     title: 'Full Board Meeting',
     startTime: '11:30',
     endTime: '13:00',
-    location: "Akron Children's Museum – Community Room",
+    location: `${ORG_NAME} – Community Room`,
     createDocs: true,
     sendInvite: false,
   },
@@ -248,7 +248,7 @@ export default function AddMeetingForm({ onClose, onSuccess }) {
             }
           }
         } catch (linkErr) {
-          console.warn('Doc linking failed:', linkErr.message);
+          if (import.meta.env.DEV) console.warn('Doc linking failed:', linkErr.message);
         }
 
         updateStep('docs', { status: 'done', label: 'Documents created in Google Drive' });

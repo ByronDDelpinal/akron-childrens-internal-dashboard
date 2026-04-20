@@ -26,14 +26,15 @@ export async function validatePassword(password) {
       return data?.valid === true;
     } catch (err) {
       // Edge Function not deployed yet — fall back to dev password
-      console.warn('Edge Function unavailable, falling back to dev password:', err.message);
+      if (import.meta.env.DEV) console.warn('Edge Function unavailable, falling back to dev password:', err.message);
       const devPassword = import.meta.env.VITE_DEV_PASSWORD;
       if (devPassword) return password === devPassword;
       return false;
     }
   }
 
-  // No Supabase configured — use dev password
-  const devPassword = import.meta.env.VITE_DEV_PASSWORD || 'acm2026';
+  // No Supabase configured — use dev password (must be set in .env)
+  const devPassword = import.meta.env.VITE_DEV_PASSWORD;
+  if (!devPassword) return false;
   return password === devPassword;
 }

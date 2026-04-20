@@ -69,7 +69,7 @@ export function useMeetingDocuments(meetingSlug) {
           setDocuments(docs);
         }
       } catch (err) {
-        console.warn('Failed to fetch meeting documents:', err.message);
+        if (import.meta.env.DEV) console.warn('Failed to fetch meeting documents:', err.message);
         if (!cancelled) setError(err.message);
       } finally {
         if (!cancelled) setIsLoading(false);
@@ -121,7 +121,7 @@ export function useDocuments(category = null) {
           setDocuments(data.map(mapDoc));
         }
       } catch (err) {
-        console.warn('Failed to fetch documents:', err.message);
+        if (import.meta.env.DEV) console.warn('Failed to fetch documents:', err.message);
         if (!cancelled) setError(err.message);
       } finally {
         if (!cancelled) setIsLoading(false);

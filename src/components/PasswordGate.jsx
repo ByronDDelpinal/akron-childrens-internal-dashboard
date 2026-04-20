@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Lock } from 'lucide-react';
+import { ORG_NAME } from '../lib/constants';
 
 export default function PasswordGate({ onLogin, isLoading, error }) {
   const [password, setPassword] = useState('');
@@ -26,7 +27,7 @@ export default function PasswordGate({ onLogin, isLoading, error }) {
               Board Portal
             </h1>
             <p className="text-med-gray text-sm mt-1">
-              Akron Children's Museum
+              {ORG_NAME}
             </p>
           </div>
 

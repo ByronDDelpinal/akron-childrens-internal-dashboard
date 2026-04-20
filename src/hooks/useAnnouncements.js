@@ -54,7 +54,7 @@ export function useAnnouncements() {
           setAnnouncements(data.map(mapRow));
         }
       } catch (err) {
-        console.error('Failed to fetch announcements:', err.message);
+        if (import.meta.env.DEV) console.error('Failed to fetch announcements:', err.message);
         setError(err.message);
       } finally {
         if (!cancelled) setIsLoading(false);
@@ -99,7 +99,7 @@ export function useAddAnnouncement() {
       if (insertErr) throw insertErr;
       return data;
     } catch (err) {
-      console.error('Failed to add announcement:', err.message);
+      if (import.meta.env.DEV) console.error('Failed to add announcement:', err.message);
       setError(err.message);
       return null;
     } finally {

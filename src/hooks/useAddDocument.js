@@ -72,7 +72,7 @@ export function useAddDocument() {
 
       return doc;
     } catch (err) {
-      console.error('Failed to add document:', err.message);
+      if (import.meta.env.DEV) console.error('Failed to add document:', err.message);
       setError(err.message);
       return null;
     } finally {

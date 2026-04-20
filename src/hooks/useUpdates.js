@@ -49,7 +49,7 @@ export function useUpdates(limit = 10) {
           setUpdates(data.map(mapRow));
         }
       } catch (err) {
-        console.warn('Supabase updates fetch failed:', err.message);
+        if (import.meta.env.DEV) console.warn('Supabase updates fetch failed:', err.message);
         setError(err.message);
       } finally {
         if (!cancelled) setIsLoading(false);
@@ -76,6 +76,6 @@ export async function createUpdate({ title, summary, source = 'system' }) {
     .insert({ title, summary, source });
 
   if (error) {
-    console.warn('Auto-update insert failed:', error.message);
+    if (import.meta.env.DEV) console.warn('Auto-update insert failed:', error.message);
   }
 }

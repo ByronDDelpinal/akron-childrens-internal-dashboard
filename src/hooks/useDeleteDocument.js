@@ -36,7 +36,7 @@ export function useDeleteDocument() {
 
       return true;
     } catch (err) {
-      console.error('Failed to delete document:', err.message);
+      if (import.meta.env.DEV) console.error('Failed to delete document:', err.message);
       setError(err.message);
       return false;
     } finally {

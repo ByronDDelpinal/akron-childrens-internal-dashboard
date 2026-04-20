@@ -3,6 +3,11 @@
  * Single source of truth for labels, options, and mapping helpers.
  */
 
+// ── Organization ──
+
+export const ORG_NAME = "Akron Children's Museum";
+export const ORG_SHORT = 'ACM';
+
 // ── Document Categories ──
 
 export const categoryLabels = {

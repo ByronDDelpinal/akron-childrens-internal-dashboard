@@ -35,7 +35,7 @@ export function useCreateMeetingDocs() {
       // }
       return data;
     } catch (err) {
-      console.error('Failed to create meeting docs:', err.message);
+      if (import.meta.env.DEV) console.error('Failed to create meeting docs:', err.message);
       setError(err.message);
       return null;
     } finally {
@@ -73,7 +73,7 @@ export function useCreateCalendarEvent() {
 
       return data; // { eventId, eventUrl }
     } catch (err) {
-      console.error('Failed to create calendar event:', err.message);
+      if (import.meta.env.DEV) console.error('Failed to create calendar event:', err.message);
       setError(err.message);
       return null;
     } finally {

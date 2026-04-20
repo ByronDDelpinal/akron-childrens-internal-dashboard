@@ -6,18 +6,15 @@ import {
   Clock,
   MapPin,
   ArrowLeft,
-  FileText,
-  ExternalLink,
-  Download,
   FolderOpen,
   FolderRoot,
   Plus,
   Pencil,
-  Trash2,
 } from 'lucide-react';
 import Card, { CardHeader } from '../components/ui/Card';
 import Badge from '../components/ui/Badge';
 import IconBox from '../components/ui/IconBox';
+import DocumentCard from '../components/documents/DocumentCard';
 import AddDocumentForm from '../components/documents/AddDocumentForm';
 import EditMeetingForm from '../components/meetings/EditMeetingForm';
 import ConfirmModal from '../components/ui/ConfirmModal';
@@ -25,55 +22,9 @@ import { useMeetings } from '../hooks/useMeetings';
 import { useMeetingDocuments } from '../hooks/useMeetingDocuments';
 import { useDeleteDocument } from '../hooks/useDeleteDocument';
 import { formatDateMedium } from '../lib/formatters';
-import { categoryLabels, getMeetingAccent } from '../lib/constants';
+import { getMeetingAccent } from '../lib/constants';
 import { googleCalendarUrl } from '../lib/calendar';
 import { timeDisplay, typeLabel } from '../data/meetings';
-
-function DocumentRow({ doc, onRequestDelete, isDeleting }) {
-  const isExternal = doc.storageType === 'external';
-  const href = isExternal ? doc.externalUrl : doc.storagePath;
-
-  return (
-    <div className="flex items-center gap-3 p-3 rounded-lg bg-light-gray/60 border border-border/50 group">
-      <a
-        href={href}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="flex items-center gap-3 min-w-0 flex-1 hover:opacity-80 transition-opacity"
-      >
-        <IconBox icon={FileText} accent="teal" size="sm" />
-        <div className="min-w-0 flex-1">
-          <p className="text-sm font-medium text-dark group-hover:text-teal transition-colors truncate">
-            {doc.title}
-          </p>
-          <div className="flex items-center gap-2 mt-0.5">
-            <span className="text-[10px] text-med-gray bg-white px-1.5 py-0.5 rounded">
-              {categoryLabels[doc.category] || doc.category}
-            </span>
-            {doc.fileName && (
-              <span className="text-[10px] text-med-gray truncate">{doc.fileName}</span>
-            )}
-          </div>
-        </div>
-        {isExternal ? (
-          <ExternalLink className="w-4 h-4 text-med-gray shrink-0" />
-        ) : (
-          <Download className="w-4 h-4 text-med-gray shrink-0" />
-        )}
-      </a>
-      <button
-        onClick={() => onRequestDelete(doc)}
-        disabled={isDeleting}
-        className="p-1.5 rounded-lg text-med-gray hover:text-orange hover:bg-orange/10
-                   transition-colors opacity-0 group-hover:opacity-100 shrink-0
-                   disabled:opacity-50"
-        title="Delete document"
-      >
-        <Trash2 className="w-3.5 h-3.5" />
-      </button>
-    </div>
-  );
-}
 
 export default function MeetingDetail() {
   const { slug } = useParams();
@@ -236,7 +187,7 @@ export default function MeetingDetail() {
         ) : documents.length > 0 ? (
           <div className="space-y-2">
             {documents.map(doc => (
-              <DocumentRow key={doc.id} doc={doc} onRequestDelete={setDocToDelete} isDeleting={isDeleting} />
+              <DocumentCard key={doc.id} doc={doc} onRequestDelete={setDocToDelete} isDeleting={isDeleting} variant="compact" />
             ))}
           </div>
         ) : (

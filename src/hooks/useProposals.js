@@ -55,7 +55,7 @@ export function useProposals() {
           setProposals(data.map(mapRow));
         }
       } catch (err) {
-        console.error('Failed to fetch proposals:', err.message);
+        if (import.meta.env.DEV) console.error('Failed to fetch proposals:', err.message);
         setError(err.message);
       } finally {
         if (!cancelled) setIsLoading(false);
@@ -111,7 +111,7 @@ export function useAddProposal() {
 
       return data;
     } catch (err) {
-      console.error('Failed to add proposal:', err.message);
+      if (import.meta.env.DEV) console.error('Failed to add proposal:', err.message);
       setError(err.message);
       return null;
     } finally {
@@ -161,7 +161,7 @@ export function useUpdateProposalStatus() {
 
       return true;
     } catch (err) {
-      console.error('Failed to update proposal status:', err.message);
+      if (import.meta.env.DEV) console.error('Failed to update proposal status:', err.message);
       setError(err.message);
       return false;
     } finally {

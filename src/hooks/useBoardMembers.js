@@ -54,7 +54,7 @@ export function useBoardMembers() {
           setMembers(data.map(mapRow));
         }
       } catch (err) {
-        console.error('Failed to fetch board members:', err.message);
+        if (import.meta.env.DEV) console.error('Failed to fetch board members:', err.message);
         setError(err.message);
       } finally {
         if (!cancelled) setIsLoading(false);

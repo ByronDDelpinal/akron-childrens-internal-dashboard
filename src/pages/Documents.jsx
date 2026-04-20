@@ -1,76 +1,11 @@
 import { useState, useMemo } from 'react';
-import {
-  Search,
-  Filter,
-  FileText,
-  ExternalLink,
-  Download,
-  FolderOpen,
-  Plus,
-  Trash2,
-} from 'lucide-react';
-import IconBox from '../components/ui/IconBox';
+import { Search, Filter, FolderOpen, Plus } from 'lucide-react';
+import DocumentCard from '../components/documents/DocumentCard';
 import AddDocumentForm from '../components/documents/AddDocumentForm';
 import ConfirmModal from '../components/ui/ConfirmModal';
 import { useDocuments } from '../hooks/useMeetingDocuments';
 import { useDeleteDocument } from '../hooks/useDeleteDocument';
-import { formatDateShort } from '../lib/formatters';
-import { categoryLabels, categoryOptions } from '../lib/constants';
-
-function DocumentCard({ doc, onRequestDelete, isDeleting }) {
-  const isExternal = doc.storageType === 'external';
-  const href = isExternal ? doc.externalUrl : doc.storagePath;
-
-  return (
-    <div className="flex items-center gap-3 p-4 bg-white rounded-xl border border-border
-                    hover:shadow-sm hover:border-teal/30 transition-all group">
-      <a
-        href={href}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="flex items-center gap-3 min-w-0 flex-1 hover:opacity-80 transition-opacity"
-      >
-        <IconBox icon={FileText} accent="teal" size="sm" />
-        <div className="min-w-0 flex-1">
-          <p className="text-sm font-medium text-dark group-hover:text-teal transition-colors truncate">
-            {doc.title}
-          </p>
-          <div className="flex items-center gap-2 mt-1">
-            <span className="text-[10px] text-med-gray bg-light-gray px-1.5 py-0.5 rounded">
-              {categoryLabels[doc.category] || doc.category}
-            </span>
-            {doc.fileName && (
-              <span className="text-[10px] text-med-gray truncate">{doc.fileName}</span>
-            )}
-            {doc.createdAt && (
-              <span className="text-[10px] text-med-gray">
-                {formatDateShort(doc.createdAt.slice(0, 10))}
-              </span>
-            )}
-          </div>
-          {doc.description && (
-            <p className="text-xs text-med-gray mt-1 truncate">{doc.description}</p>
-          )}
-        </div>
-        {isExternal ? (
-          <ExternalLink className="w-4 h-4 text-med-gray shrink-0" />
-        ) : (
-          <Download className="w-4 h-4 text-med-gray shrink-0" />
-        )}
-      </a>
-      <button
-        onClick={() => onRequestDelete(doc)}
-        disabled={isDeleting}
-        className="p-1.5 rounded-lg text-med-gray hover:text-orange hover:bg-orange/10
-                   transition-colors opacity-0 group-hover:opacity-100 shrink-0
-                   disabled:opacity-50"
-        title="Delete document"
-      >
-        <Trash2 className="w-3.5 h-3.5" />
-      </button>
-    </div>
-  );
-}
+import { categoryOptions } from '../lib/constants';
 
 export default function Documents() {
   const { documents, isLoading, refetch } = useDocuments();

@@ -1,4 +1,5 @@
 import { displayName } from './boardMembers';
+import { ORG_NAME } from '../lib/constants';
 
 /**
  * Generate a vCard 3.0 string from a board member object.
@@ -11,7 +12,7 @@ export function generateVCard(member) {
     'VERSION:3.0',
     `N:${member.lastName};${first};;;`,
     `FN:${displayName(member)}`,
-    `ORG:Akron Children's Museum${member.organization ? ' — ' + member.organization : ''}`,
+    `ORG:${ORG_NAME}${member.organization ? ' — ' + member.organization : ''}`,
   ];
 
   if (member.title) {

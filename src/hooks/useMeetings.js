@@ -56,7 +56,7 @@ export function useMeetings() {
           setMeetings(data.map(mapRow));
         }
       } catch (err) {
-        console.error('Failed to fetch meetings:', err.message);
+        if (import.meta.env.DEV) console.error('Failed to fetch meetings:', err.message);
         setError(err.message);
       } finally {
         if (!cancelled) setIsLoading(false);
@@ -167,7 +167,7 @@ export function useAddMeeting() {
             ]);
         } catch (placeholderErr) {
           // Non-critical — log but don't fail the meeting creation
-          console.warn('Auto-placeholder creation failed:', placeholderErr.message);
+          if (import.meta.env.DEV) console.warn('Auto-placeholder creation failed:', placeholderErr.message);
         }
       }
 
@@ -180,7 +180,7 @@ export function useAddMeeting() {
 
       return data;
     } catch (err) {
-      console.error('Failed to add meeting:', err.message);
+      if (import.meta.env.DEV) console.error('Failed to add meeting:', err.message);
       setError(err.message);
       return null;
     } finally {
@@ -238,7 +238,7 @@ export function useUpdateMeeting() {
 
       return true;
     } catch (err) {
-      console.error('Failed to update meeting:', err.message);
+      if (import.meta.env.DEV) console.error('Failed to update meeting:', err.message);
       setError(err.message);
       return false;
     } finally {
