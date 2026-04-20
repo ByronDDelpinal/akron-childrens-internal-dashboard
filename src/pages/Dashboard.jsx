@@ -12,17 +12,20 @@ import RevenueChart from '../components/RevenueChart';
 import NetAssetsChart from '../components/NetAssetsChart';
 import MeetingsList from '../components/MeetingsList';
 import AnnouncementsList from '../components/AnnouncementsList';
+import UpdatesList from '../components/UpdatesList';
 import AddAnnouncementForm from '../components/AddAnnouncementForm';
 import { revenueExpenseData, netAssetsData } from '../data/financials';
 import { quickStats } from '../data/dashboard';
 import { useMeetings } from '../hooks/useMeetings';
 import { useAnnouncements } from '../hooks/useAnnouncements';
+import { useUpdates } from '../hooks/useUpdates';
 import { upcomingMeetings, timeDisplay } from '../data/meetings';
 import { formatDollarDetail, formatNumber } from '../lib/formatters';
 
 export default function Dashboard() {
   const { meetings } = useMeetings();
   const { announcements, refetch: refetchAnnouncements } = useAnnouncements();
+  const { updates } = useUpdates(5);
   const [showAddAnnouncement, setShowAddAnnouncement] = useState(false);
 
   const upcoming = upcomingMeetings(meetings).slice(0, 4);
@@ -63,13 +66,14 @@ export default function Dashboard() {
         />
       </div>
 
-      {/* Meetings + Announcements */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      {/* Meetings + Announcements + Updates */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         <MeetingsList meetings={enriched} />
         <AnnouncementsList
           announcements={announcements}
           onAdd={() => setShowAddAnnouncement(true)}
         />
+        <UpdatesList updates={updates} />
       </div>
 
       {/* Add Announcement slide-over */}

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { supabase } from '../lib/supabase';
+import { createUpdate } from './useUpdates';
 
 /**
  * Inserts a new external-link document into Supabase and optionally
@@ -62,17 +63,12 @@ export function useAddDocument() {
         }
       }
 
-      // 3. Auto-create a low-priority announcement
-      await supabase
-        .from('announcements')
-        .insert({
-          title: `New document added: ${title}`,
-          summary: description || `A new ${category.replace(/_/g, ' ')} has been added to the document library.`,
-          priority: 'normal',
-        })
-        .then(({ error: annErr }) => {
-          if (annErr) console.warn('Auto-announcement failed:', annErr.message);
-        });
+      // 3. Auto-create an update entry
+      await createUpdate({
+        title: `New document added: ${title}`,
+        summary: description || `A new ${category.replace(/_/g, ' ')} has been added to the document library.`,
+        source: 'document',
+      });
 
       return doc;
     } catch (err) {

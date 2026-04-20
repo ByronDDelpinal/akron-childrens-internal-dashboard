@@ -22,7 +22,7 @@ export default function AnnouncementsList({ announcements, onAdd }) {
           </button>
         )}
       </CardHeader>
-      <div className="space-y-3">
+      <div className="space-y-3 max-h-[320px] overflow-y-auto">
         {announcements.length > 0 ? (
           announcements.map((item) => (
             <div key={item.id} className="flex gap-3">

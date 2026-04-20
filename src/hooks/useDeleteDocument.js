@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { supabase } from '../lib/supabase';
+import { createUpdate } from './useUpdates';
 
 /**
  * Deletes a document from Supabase and creates a low-priority announcement.
@@ -26,17 +27,12 @@ export function useDeleteDocument() {
 
       if (delErr) throw delErr;
 
-      // Auto-create announcement
-      await supabase
-        .from('announcements')
-        .insert({
-          title: `Document removed: ${doc.title}`,
-          summary: `The ${(doc.category || 'document').replace(/_/g, ' ')} "${doc.title}" has been removed from the library.`,
-          priority: 'normal',
-        })
-        .then(({ error: annErr }) => {
-          if (annErr) console.warn('Auto-announcement failed:', annErr.message);
-        });
+      // Auto-create update entry
+      await createUpdate({
+        title: `Document removed: ${doc.title}`,
+        summary: `The ${(doc.category || 'document').replace(/_/g, ' ')} "${doc.title}" has been removed from the library.`,
+        source: 'document',
+      });
 
       return true;
     } catch (err) {

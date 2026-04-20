@@ -49,7 +49,7 @@ export function useAnnouncements() {
           .eq('is_archived', false)
           .or(`expires_at.is.null,expires_at.gt.${now}`)
           .order('posted_at', { ascending: false })
-          .limit(10);
+          .limit(5);
 
         if (fetchError) throw fetchError;
 

@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '../lib/supabase';
+import { createUpdate } from './useUpdates';
 
 /**
  * Maps a Supabase row (snake_case) → camelCase JS object.
@@ -103,17 +104,12 @@ export function useAddProposal() {
 
       if (insertErr) throw insertErr;
 
-      // Auto-create announcement
-      await supabase
-        .from('announcements')
-        .insert({
-          title: `New proposal submitted: ${title}`,
-          summary: `${submitter} submitted a proposal${boardVote ? ' requiring board vote' : ''}${timeSensitive ? ' (time-sensitive)' : ''}.`,
-          priority: timeSensitive ? 'high' : 'normal',
-        })
-        .then(({ error: annErr }) => {
-          if (annErr) console.warn('Auto-announcement failed:', annErr.message);
-        });
+      // Auto-create update entry
+      await createUpdate({
+        title: `New proposal submitted: ${title}`,
+        summary: `${submitter} submitted a proposal${boardVote ? ' requiring board vote' : ''}${timeSensitive ? ' (time-sensitive)' : ''}.`,
+        source: 'proposal',
+      });
 
       return data;
     } catch (err) {
@@ -129,7 +125,7 @@ export function useAddProposal() {
 }
 
 /**
- * Updates a proposal's status and auto-creates an announcement.
+ * Updates a proposal's status and auto-creates an update entry.
  */
 export function useUpdateProposalStatus() {
   const [isUpdating, setIsUpdating] = useState(false);
@@ -157,18 +153,13 @@ export function useUpdateProposalStatus() {
 
       if (updateErr) throw updateErr;
 
-      // Auto-create announcement
+      // Auto-create update entry
       const verb = newStatus === 'approved' ? 'approved' : newStatus === 'denied' ? 'denied' : `moved to ${newStatus}`;
-      await supabase
-        .from('announcements')
-        .insert({
-          title: `Proposal ${verb}: ${proposal.title}`,
-          summary: `The proposal "${proposal.title}" by ${proposal.submitter} has been ${verb}.`,
-          priority: 'normal',
-        })
-        .then(({ error: annErr }) => {
-          if (annErr) console.warn('Auto-announcement failed:', annErr.message);
-        });
+      await createUpdate({
+        title: `Proposal ${verb}: ${proposal.title}`,
+        summary: `The proposal "${proposal.title}" by ${proposal.submitter} has been ${verb}.`,
+        source: 'proposal',
+      });
 
       return true;
     } catch (err) {
